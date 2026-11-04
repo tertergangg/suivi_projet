@@ -2,7 +2,7 @@
 
 Ce document dit où en est le projet. Il a deux parties : la liste des problèmes ouverts, tenue à jour (un problème réglé en sort), puis les entrées du journal, la plus récente en haut. Une entrée fait 5 à 10 lignes et ne recopie pas les problèmes ouverts (voir CONVENTIONS).
 
-Le détail des entrées jusqu’au 4 novembre 2026 est dans l’historique Git de ce fichier : le premier commit du dossier `projet/` contient l’ancienne version complète.
+Le détail des entrées jusqu’au 4 novembre 2026 est dans l’historique Git de ce fichier : le premier commit du dossier `suivi_projet/` contient l’ancienne version complète.
 
 ---
 
@@ -43,10 +43,16 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - Cloudflare, onglet « Previews Base » : la Build command et la Preview command sont saisies mais ignorées. Si Cloudflare se met à les appliquer, le site sera fabriqué plusieurs fois : sans danger, mais à nettoyer.
 - Avertissements Git « LF will be replaced by CRLF » (réglage `core.autocrlf` de Windows) : sans danger. Piste : un fichier `.gitattributes`.
 - Le README et ARCHITECTURE se recoupent (arborescence, déploiement). Principe proposé : le README reste un mode d’emploi, et le détail technique va dans ARCHITECTURE.
+- `npm install` signale que les scripts postinstall d’esbuild et de workerd (arrivés avec wrangler) ne sont pas couverts par `allowScripts` : ils ne sont pas lancés. Sans effet constaté, en local comme sur Cloudflare. À surveiller si une version de npm en fait une erreur.
 
 ---
 
 # Entrées
+
+## 4 novembre 2026 · Version de wrangler fixée
+**Fait** : wrangler ajouté aux `devDependencies` en version exacte 4.157.0, celle du dernier déploiement de production réussi (`npm install --save-dev --save-exact`). `package-lock.json` mis à jour et commité. Vérifié par une simulation locale (`npx wrangler deploy --dry-run`), puis sur la version de test et en production : le log affiche `wrangler 4.157.0`. Le nom du dossier des documents est corrigé partout : `suivi_projet/`, et non `projet/`.
+**Reste à faire** : trier les « Idées à trier » dans une conversation dédiée, puis la phase 2 (étape 2a).
+**Décisions prises** : aucune (application de D16).
 
 ## 4 novembre 2026 · Revue d’ensemble avant la phase 2
 **Fait** : relecture complète des documents et du code. Les bases sont saines. Risques relevés : une documentation qui grossissait plus vite que le site ; une phase 2 trop large, dont la décision principale était cachée (app.js, chargé en `is:inline`, ne peut pas partager de code avec les pages) ; un chemin d’image relatif qui casserait sur les pages ; wrangler non fixé ; un contenu qui avance moins vite que l’outillage (aucune fiche œuvre rédigée, une seule image). Documents mis à jour : ils vont dans le dépôt, le JOURNAL est raccourci autour d’une seule liste de problèmes ouverts, ARCHITECTURE ne décrit plus app.js fonction par fonction, la phase 2 est découpée en six étapes, CONVENTIONS est alignée sur le code, la section « Variables » de style.css est corrigée dans le README. Les renommages de `majDecennies()`, `.decennie` et `#decennies` sont retirés de la roadmap.

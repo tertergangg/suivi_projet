@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : préparation de la phase 2.** Dans l’ordre : fixer la version de wrangler (D16), puis trier les « Idées à trier » dans une conversation dédiée. Viennent ensuite la phase 2, le lot 4 (téléphone), puis la phase 3 (ouverture au public).
+**Étape en cours : préparation de la phase 2.** Il reste à trier les « Idées à trier », dans une conversation dédiée. Viennent ensuite la phase 2, le lot 4 (téléphone), puis la phase 3 (ouverture au public).
 
 ---
 
@@ -14,7 +14,7 @@ Le détail est dans le JOURNAL et dans l’historique Git.
 
 ## Préparation de la phase 2
 1. Mettre les six documents dans le dépôt, dans `suivi_projet/` (D12). Terminé le 4 novembre 2026.
-2. Ajouter wrangler aux `devDependencies`, à une version exacte (D16). Vérifier dans le journal de déploiement de Cloudflare que c’est bien cette version qui est utilisée.
+2. Ajouter wrangler aux `devDependencies`, à une version exacte (D16). Terminé le 4 novembre 2026 (version 4.157.0).
 3. Trier les « Idées à trier », dans une conversation dédiée (voir plus bas).
 
 ## Phase 2 · Une page par fiche

@@ -20,11 +20,12 @@ C’est l’état de la branche `main`, celle qui est en ligne.
 ```
 README.md                   mode d’emploi (installation, travail sur le contenu, publication)
 construire.py               tableur + fiches -> public/data.js (Python, librairie openpyxl)
-package.json                projet Astro : dépendance astro, scripts dev, build, preview
+package.json                projet Astro : dépendance astro, wrangler en devDependencies (version exacte, D16), scripts dev, build, preview
+package-lock.json           FABRIQUÉ par npm : versions exactes de toutes les dépendances, ne jamais le modifier à la main
 astro.config.mjs            configuration d’Astro (par défaut, vide)
 wrangler.jsonc              configuration Cloudflare : lance npm run build, publie ./dist
 .gitignore                  ignore node_modules/, dist/, .astro/
-projet/                     documents de suivi du projet (D12), ignorés par Astro
+suivi_projet/               documents de suivi du projet (D12), ignorés par Astro
 donnees/
   frise_art_moderne_base.xlsx
 fiches/
@@ -96,7 +97,7 @@ La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant
 À chaque push, Cloudflare installe les dépendances, puis lance la Deploy command `npx wrangler deploy`. Wrangler lit le bloc `build` de `wrangler.jsonc`, lance `npm run build`, puis publie `./dist`. Dans le tableau de bord, la Build command de l’onglet Production reste vide, sans quoi le site serait fabriqué deux fois.
 - Branche de production : `main`. Adresse : https://frise-chronologique---art-moderne.tjimblet.workers.dev
 - Les autres branches ont une version de test (encadré « Previews »), publiée par `wrangler preview` (commande en bêta) grâce au bloc `"previews": {}`.
-- wrangler n’est pas encore dans les dépendances : `npx` télécharge la dernière version à chaque déploiement. À fixer (D16).
+- wrangler est fixé à une version exacte dans les `devDependencies` (4.157.0, D16) : `npx wrangler deploy` utilise cette version, installée avec le reste. On la change seulement par choix, dans une branche testée.
 - GitHub Pages est désactivé : l’ancienne adresse en github.io renvoie une erreur 404 (D11).
 
 ---
@@ -115,7 +116,7 @@ La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant
 ```
 astro.config.mjs  package.json  wrangler.jsonc  .gitignore  README.md
 construire.py                 écrit src/data/frise.json
-projet/  donnees/  fiches/    inchangés
+suivi_projet/  donnees/  fiches/    inchangés
 public/                       copié tel quel : images, favicon
 src/
   data/frise.json             GÉNÉRÉ, commité (D8)

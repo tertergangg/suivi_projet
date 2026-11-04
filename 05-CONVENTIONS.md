@@ -46,7 +46,7 @@ Ces règles décrivent le style déjà en place dans le code. Le nouveau code do
 - Dans le code, on garde les guillemets et apostrophes droits (' et ").
 
 ## Documents du projet
-- Les six documents sont dans `projet/` (D12). Ils sont mis à jour à la clôture de chaque conversation, dans un commit à part.
+- Les six documents sont dans `suivi_projet/` (D12). Ils sont mis à jour à la clôture de chaque conversation, dans un commit à part.
 - **JOURNAL** : 5 à 10 lignes par entrée (fait, reste à faire, décisions). Une entrée ne recopie pas les problèmes ouverts : la liste en tête du JOURNAL est tenue à jour, et un problème réglé en sort.
 - Un défaut propre au téléphone va dans la ROADMAP, au lot 4, et pas dans la liste des problèmes ouverts.
 - **ARCHITECTURE** décrit le flux, les fichiers, les formats et les principes, pas chaque fonction : le détail est dans les commentaires du code.
@@ -57,3 +57,5 @@ Ces règles décrivent le style déjà en place dans le code. Le nouveau code do
 - Messages courts en français, qui décrivent le changement : « Recherche insensible aux accents ».
 - On relit le diff dans VS Code avant chaque commit.
 - On lance `python construire.py` avant tout commit qui touche le tableur ou les fiches.
+- `package-lock.json` est fabriqué par npm : on ne le modifie jamais à la main. En cas de conflit, on garde la version de `main`, puis on relance `npm install`.
+- Au début de chaque phase, on regarde si une nouvelle version de wrangler existe. Si oui, on la teste dans une branche avant de l’installer dans `main` (D16).

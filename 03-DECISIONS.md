@@ -44,7 +44,7 @@ On s’appuie sur la colonne « Domaine public ? » du tableur. Une œuvre encor
 GitHub Pages est désactivé et `docs/` supprimé : l’ancienne adresse en github.io renvoie une erreur 404. C’est le choix le plus simple : rien à maintenir jusqu’à la phase 3.
 Alternative écartée : garder `docs/` jusqu’à la phase 3 pour y placer une page de redirection vers le .com.
 
-**D12 · Les documents du projet sont dans le dépôt, dossier `projet/`** · Décidé (4 novembre 2026)
+**D12 · Les documents du projet sont dans le dépôt, dossier `suivi_projet/`** · Décidé (4 novembre 2026)
 Les six documents (CONTEXTE, ARCHITECTURE, DECISIONS, ROADMAP, CONVENTIONS, JOURNAL) sont versionnés avec le code : on sait toujours quelle version des documents va avec quelle version du site, et l’historique Git garde le détail des anciennes entrées du JOURNAL. Astro ignore ce dossier, qui n’est ni dans `src/` ni dans `public/`. Le dépôt étant public, ces documents sont visibles par tous. Ce sont ces fichiers que l’on recopie dans le projet Claude.
 Alternative écartée : les garder hors du dépôt, où ils finissent par se décaler du code.
 
