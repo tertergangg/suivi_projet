@@ -24,6 +24,7 @@ Ces règles décrivent le style déjà en place dans le code. Le nouveau code do
 - Pas de style écrit en dur dans index.astro (ni, plus tard, dans les autres gabarits). Dans app.js, l’attribut `style` ne sert qu’aux valeurs calculées : positions et largeurs (`left`, `width`) et couleur du mouvement (`--c`). Tout le reste va dans style.css.
 - Une nouvelle règle va dans la section de son élément, et sa version téléphone dans le bloc `@media (max-width: 720px)` de cette section.
 - On garde le focus visible et le respect de `prefers-reduced-motion`.
+- La frise est l’affiche, les pages sont le livre (D25). La frise et les outils de navigation gardent bordures épaisses et ombres décalées. Sur les pages de lecture, les traits sont des filets, la typographie porte la hiérarchie, et les cartes sont réservées aux œuvres. Une page doit rester complète sans image.
 
 ## Python (construire.py)
 - Indentation de quatre espaces, noms en français.
@@ -32,14 +33,20 @@ Ces règles décrivent le style déjà en place dans le code. Le nouveau code do
 ## Identifiants
 - En minuscules, sans accents, avec des tirets : `van-gogh`, `les-demoiselles-d-avignon`.
 - L’identifiant est le même dans le tableur (colonne ID), dans le nom de la fiche (`<id>.md`) et dans l’adresse de la page.
-- Il est unique sur tout le site, tous types confondus.
+- Il est unique sur tout le site, tous types confondus : mouvements, artistes, œuvres, événements, groupes, termes du glossaire, parcours et comparaisons.
 - On ne le change plus une fois le site public (D9).
 
 ## Fiches
 - Un en-tête YAML avec `id` et `type`, puis un titre `#`, puis les rubriques du gabarit correspondant dans `fiches/_gabarits/`.
-- Pour lier une autre fiche : `[[id]]` ou `[[id|texte du lien]]`.
+- Pour lier une autre fiche, un groupe ou un terme du glossaire : `[[id]]` ou `[[id|texte du lien]]`. On ne met pas de lien automatique sur les mots.
 - Les commentaires `<!-- -->` des gabarits ne s’affichent pas.
 - Les fiches mouvements et artistes n’ont pas de section « Sources ».
+- Une fiche œuvre a deux parties : la présentation, qui suffit à publier la page, puis l’analyse (D21).
+- Les fiches de parcours (`fiches/parcours/`) et de comparaison (`fiches/comparaisons/`) listent dans leur en-tête YAML les identifiants qu’elles relient (D24). Elles ne recopient aucun texte d’une autre fiche.
+
+## Tableur
+- Les relations (onglet « Influences ») n’utilisent que les types de D23 : `influence`, `collaboration`, `rivalité`, `filiation`, `réaction`. Une relation sans explication est permise, mais on n’invente jamais d’explication.
+- On ne saisit pas ce qui se calcule : les contemporains, la période d’un artiste dans un mouvement, les listes d’œuvres ou d’artistes.
 
 ## Typographie des textes affichés
 - Apostrophe typographique (’), guillemets français (« ») et tiret demi-cadratin entre deux dates (1874–1960).

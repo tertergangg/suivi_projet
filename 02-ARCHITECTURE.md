@@ -107,46 +107,122 @@ La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant
 
 ---
 
-# B. Architecture cible : une page par fiche (phase 2)
+# B. Architecture cible : le site complet (phase 2 et suivantes)
+
+Les choix de cette partie sont fixés par D17 à D28. Un prototype de structure, publié sur claude.ai le 6 novembre 2026 et rangé hors du dépôt, en donne une image cliquable ; il est antérieur aux décisions D20 à D22 et montre encore une sous-rubrique « Textes ».
 
 ## Principes
-1. **Les sources ne bougent pas.** Le tableur et les fiches restent la source de vérité et se modifient comme aujourd’hui.
+1. **Les sources ne bougent pas.** Le tableur et les fiches restent la source de vérité et se modifient comme aujourd’hui (D5).
 2. **construire.py reste la porte d’entrée des données** et garde toutes ses vérifications (D7). Il écrira `src/data/frise.json`, commité (D8).
-3. **Astro génère des pages HTML statiques** : la frise, plus une page par fiche rédigée (D13). Pas de serveur ni de base de données.
-4. **La frise garde sa logique et son apparence.** Son script devient un module traité par Astro, sans réécriture (D15).
-5. **Une seule fabrique pour les fiches.** Les fonctions qui produisent le contenu d’une fiche sont dans `src/lib/` et servent au panneau comme aux pages.
-6. **Aucun framework** d’interface (React, Vue…) ni de CSS (Tailwind…).
+3. **Astro génère des pages HTML statiques** : la frise, plus une page par fiche rédigée (D13, D21). Pas de serveur ni de base de données.
+4. **La frise garde sa logique et son apparence**, et reste l’accueil (D17). Son script devient un module traité par Astro, sans réécriture (D15).
+5. **Un outil, une question ; un texte, une page** (D19). Les listes sont calculées, jamais écrites.
+6. **Une seule fabrique pour les fiches.** Les fonctions qui produisent le contenu d’une fiche sont dans `src/lib/` et servent au panneau comme aux pages.
+7. **Une rubrique n’apparaît qu’avec son contenu** (D18).
+8. **La frise est l’affiche, les pages sont le livre** (D25).
+9. **Aucun framework** d’interface (React, Vue…) ni de CSS (Tailwind…).
+
+## Plan du site
+```
+/                          la frise : zooms Ensemble, Moyen, Détail ; vue mouvement ; panneau des fiches
+/mouvements/               répertoire des mouvements
+  /mouvements/<id>/        page mouvement ; ses groupes en sections (#<id-du-groupe>)
+/artistes/                 répertoire des artistes, rangés par mouvement principal
+  /artistes/<id>/          page artiste
+/oeuvres/                  catalogue : filtres mouvement, œuvres majeures, « Écrits et manifestes »
+  /oeuvres/<id>/           page œuvre, dès que l’œuvre est documentée
+/comprendre/               accueil de la rubrique (phase 4)
+  /comprendre/parcours/<id>/
+  /comprendre/comparer/<id>/
+  /comprendre/glossaire/   une page, une ancre par terme
+/a-propos/  /plan-du-site/ dans le pied de page
+/en/…                      le même arbre (phase 5)
+```
+- Les adresses sont rangées par type, jamais imbriquées, et reprennent les identifiants du tableur (D9, D18).
+- Le menu, commun à tout le site : Frise, Mouvements, Artistes, Œuvres, Comprendre (dès la phase 4), puis « Rechercher » et le thème (D28).
+- Les événements n’ont pas de page : ils vivent dans la frise et dans les « Moments clés » de leur mouvement. Les groupes n’ont pas de page au départ (D22).
+- Un lien vers un élément sans page mène à la frise, qui ouvre sa fiche (`/#id`).
+
+## Le rôle de chaque partie
+| Partie | Question | Ce qu’elle ne fait pas |
+|---|---|---|
+| Frise | Quand ? Qu’est-ce qui se passe en même temps ? | Elle ne remplace pas les pages : son panneau mène à « Lire la page ». |
+| Vue mouvement | Qui, et dans quel ordre, au sein d’un mouvement ? | Elle n’a pas de texte : elle mène à la page du mouvement. |
+| Pages | Quoi, et pourquoi ? | Elles n’ont pas de chronologie complète : un repère simple et « Voir dans la frise » (D27). |
+| Comprendre | Comment tout cela s’articule ? | Elle ne recopie aucune fiche : elle les relie. |
+| Rechercher | Où est telle chose ? | C’est un outil, pas une rubrique. |
+
+## Les gabarits
+Peu de gabarits, qui partagent leurs composants : en-tête de fiche (bande de la couleur du mouvement), fil d’Ariane, sommaire « Dans cette page », listes, carte d’œuvre, repère chronologique.
+- **Accueil** : la frise.
+- **Répertoire** : `/mouvements/`, `/artistes/`, `/oeuvres/`, et plus tard l’accueil de Comprendre.
+- **Page mouvement**, une page de contexte : repère chronologique, texte, groupes, artistes, œuvres majeures puis autres œuvres, moments clés, filiations (d’où il vient, ce qu’il annonce).
+- **Page artiste**, une page de trajectoire : rubriques (Nationalité, Disciplines, Mouvement, Aussi, Groupes), texte, œuvres dans l’ordre chronologique, liens avec d’autres artistes et mouvements.
+- **Page œuvre**, une page cartel : le cartel en grand (titre, artiste, date, technique, lieu de conservation), la reproduction si les droits le permettent (D10), la présentation, puis l’analyse si elle existe, enfin les œuvres du même artiste.
+- **Article** : un parcours ou une comparaison (phase 4).
+- **Page simple** : À propos, plan du site, 404.
+
+Sur les pages, les cartes sont réservées aux œuvres. Les mouvements et les artistes s’affichent en listes ou dans le texte (D25).
+
+## Modèle de données cible
+Ce qui change dans le tableur et dans `frise.json` (étape 2d) :
+- **Onglet « Groupes »** (nouveau) : ID, Nom, Mouvement, Début, Fin, Lieu, Résumé court (1 phrase). Un groupe est rattaché à un seul mouvement.
+- **Onglet Artistes** : nouvelle colonne « Groupes », des identifiants de groupes séparés par des virgules, comme « Autres mouvements ». Elle accepte plusieurs groupes, et un groupe d’un autre mouvement que le mouvement principal (Kandinsky : mouvement principal `abstraction`, groupe Der Blaue Reiter, rattaché à l’expressionnisme).
+- **Onglet « Influences »** : De et Vers acceptent un artiste ou un mouvement. Types autorisés (D23) :
+  - `influence` : d’un artiste vers un artiste ou un mouvement ;
+  - `collaboration`, `rivalité` : entre deux artistes ;
+  - `filiation`, `réaction` : entre deux mouvements.
+- **Onglet « Glossaire »** (nouveau) : ID, Terme, Définition, Voir aussi (identifiants séparés par des virgules). Une fiche y renvoie par `[[id]]` (D24).
+- **Niveau d’une œuvre**, déduit de sa fiche, sans colonne (D21) : fiche vide, l’œuvre est référencée ; présentation sans analyse, elle est documentée ; analyse présente, elle est analysée. Le titre qui marque l’analyse sera fixé avec le nouveau gabarit.
+- **Fiches** : deux nouveaux dossiers, `fiches/parcours/` et `fiches/comparaisons/`. Leur en-tête YAML liste les étapes (identifiants dans l’ordre) ou les deux éléments comparés.
+- **Identifiants** : groupes, termes, parcours et comparaisons partagent l’espace unique des autres éléments (D9). Le contrôle des doublons de construire.py s’étend à eux.
+
+Ce qui ne change pas : « Mouvement principal » (la frise a besoin d’un couloir par artiste) et « Autres mouvements » ; la paire Année / Date affichée pour les dates incertaines ; le format des fiches existantes.
+Ce qu’on ne stocke pas : « contemporain » (calculé à partir des dates) ; la période d’un artiste dans un mouvement (déduite des dates de ses œuvres).
+Repoussé : les attributions discutées.
 
 ## Arborescence visée
 ```
 astro.config.mjs  package.json  wrangler.jsonc  .gitignore  README.md
 construire.py                 écrit src/data/frise.json
-suivi_projet/  donnees/  fiches/    inchangés
+suivi_projet/  donnees/       inchangés
+fiches/
+  mouvements/  artistes/  oeuvres/  _gabarits/  _en-attente/
+  parcours/  comparaisons/    nouveaux (D24)
 public/                       copié tel quel : images, favicon
 src/
   data/frise.json             GÉNÉRÉ, commité (D8)
-  layouts/Base.astro          <head>, polices, script du thème, éléments communs à toutes les pages
+  layouts/Base.astro          <head>, polices, script du thème, en-tête et pied de page du site
   pages/
-    index.astro               la frise, qui reste à / (D14)
-    mouvements/[id].astro     une page par mouvement   -> /mouvements/fauvisme/
-    artistes/[id].astro       une page par artiste     -> /artistes/matisse/
-    oeuvres/[id].astro        une page par œuvre       -> /oeuvres/guernica/
+    index.astro               la frise (D17)
+    mouvements/index.astro    répertoire ; mouvements/[id].astro : une page par mouvement
+    artistes/index.astro      répertoire ; artistes/[id].astro : une page par artiste
+    oeuvres/index.astro       catalogue ; oeuvres/[id].astro : une page par œuvre documentée
+    a-propos.astro  plan-du-site.astro
+    comprendre/…              phase 4
   scripts/                    l’ancien app.js, découpé (navigation, vues, recherche, Index…)
   lib/                        partagé par la frise et les pages : contenu des fiches, liens [[id]], Markdown, outils (esc, nomCourt, compter…)
 ```
 
 ## Ce qui est déjà décidé
-- **Pages** : seulement pour les fiches rédigées (D13).
-- **Page d’accueil** : la frise reste à `/` pendant la phase 2 (D14).
+- **Accueil** : la frise, à `/`, pour de bon (D17).
+- **Rubriques et adresses** : D18. **Comprendre** : D20, ouverte après le lancement (D26).
+- **Pages** : seulement pour les fiches rédigées (D13) ; pour une œuvre, dès qu’elle est documentée (D21).
 - **Script de la frise** : un module traité par Astro, qui partage `src/lib/` avec les pages (D15).
-- **Liens** : une seule fonction de `src/lib/` transforme `[[id]]`. Dans le panneau de la frise, elle donne `#id`. Sur les pages, elle donne `/<type>/<id>/` si la fiche est rédigée, `/#id` sinon.
+- **Liens** : une seule fonction de `src/lib/` transforme `[[id]]`. Dans le panneau de la frise, elle donne `#id`. Sur les pages, elle donne `/<type>/<id>/` si la fiche est rédigée, `/mouvements/<mouvement>/#<id>` pour un groupe, `/comprendre/glossaire/#<id>` pour un terme, `/#id` sinon.
 - **Images** : chemins absolus (`/images/…`), vérifiés par construire.py, pour fonctionner à toutes les profondeurs d’adresse.
 - **Découpage d’app.js** : sans renommage. `majDecennies()`, `.decennie` et `#decennies` gardent leur nom.
+- **Recherche** : un seul outil, au lot 4 (D28).
 
 ## Points à trancher, à l’étape indiquée (voir ROADMAP)
 - **2b · Données** : comment le module de la frise reçoit `frise.json`, par un import du JSON ou par une injection dans la page. Vérifier le fonctionnement actuel dans la documentation d’Astro (guide « Scripts and event handling »).
 - **2c · Markdown** : `marked` reste-t-il chargé depuis le CDN, ou devient-il une dépendance npm, utilisée au build pour les pages et dans la frise ? La seconde option retire le CDN sans changer de librairie.
-- **2d · style.css** : reste-t-il dans `public/`, lié tel quel comme aujourd’hui, ou passe-t-il dans `src/styles/`, traité par Astro ? Rien ne l’impose : le plus simple est de le laisser où il est.
+- **2d · Analyse d’une œuvre** : le titre de section qui marque le niveau « analysée ».
+- **2e · Vue mouvement** : la forme de son adresse (D27), sachant que `/#id` ouvre aujourd’hui la fiche dans la vue détail.
+- **2e · Styles** : style.css reste-t-il dans `public/`, lié tel quel, avec les règles des pages ajoutées par section ? Ou les pages ont-elles leur propre feuille ? Le plus simple est de garder un seul fichier.
+- **2f · Images** : D10, avant le catalogue.
+- **Lot 4** : le zoom affiché lors d’une première visite.
+- **Après la phase 2** : le passage du panneau de la frise à une fiche courte (D19).
 
 ## Phase 5
 L’organisation des fichiers pour la version anglaise (`/en/…`) est à décider avant de commencer, pas pendant.

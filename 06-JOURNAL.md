@@ -51,6 +51,11 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 
 # Entrées
 
+## 6 novembre 2026 · Structure du site
+**Fait** : tri des « Idées à trier » de Lovable, puis deux nouvelles séries de maquettes Lovable (en-tête, étiquettes, zoom ; plans de site et gabarits). Un prototype de structure cliquable, fait avec les vraies données, publié sur claude.ai et gardé hors du dépôt. Une analyse de ce prototype par une autre IA, confrontée point par point. La structure est fixée : la frise reste l’accueil, cinq rubriques, des adresses par type, un texte par page, trois niveaux d’œuvre, des groupes pour les sous-courants (le néo-impressionnisme en devient un, sans couloir dans la frise), des relations typées, Comprendre réduite à trois sous-rubriques et ouverte après le lancement. Les six documents sont mis à jour.
+**Reste à faire** : l’étape 2b, dans une nouvelle conversation. La phase 2 compte désormais huit étapes (2a à 2h), dont une étape « Modèle de données » (2d). En parallèle, le gabarit des fiches œuvres à deux parties et les premières œuvres documentées.
+**Décisions prises** : D17 à D28 ; D14 est remplacé par D17, D13 est précisé par D21.
+
 ## 5 novembre 2026 · Étape 2a terminée
 **Fait** : le tri des « Idées à trier » est reporté, car il ne concerne que l’étape 2d et la suite. construire.py vérifie maintenant les liens des fiches (`verifier_liens()`) : identifiant inconnu, ou lien mal formé que la fonction `markdown()` d’app.js ne reconnaîtrait pas. Il vérifie aussi les chemins d’images (`verifier_image()`) : chemin qui ne commence ni par `/` ni par `http`, ou fichier absent de `public/`. Ce second contrôle va un peu au-delà de la roadmap. Dans le tableur, l’image d’*Impression, soleil levant* passe à `/images/…`. Testé avec de faux liens, puis sur la version de test ; fusionné dans `main`.
 **Reste à faire** : l’étape 2b, dans une nouvelle conversation. Le tri des idées, avant l’étape 2d.

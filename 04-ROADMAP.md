@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : phase 2, étape 2b.** Le tri des « Idées à trier » est reporté, et doit être fait avant l’étape 2d. Viennent ensuite le lot 4 (téléphone), puis la phase 3 (ouverture au public).
+**Étape en cours : phase 2, étape 2b.** La structure du site est fixée (D17 à D28). Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
 
 ---
 
@@ -11,56 +11,70 @@ Le détail est dans le JOURNAL et dans l’historique Git.
 - **Lot 2 · Fiches** · 2 novembre 2026. Nationalité, Disciplines, « Aussi » cliquable, fiche mouvement en deux listes d’œuvres, image en grand.
 - **Lot 3 · Design** · 4 novembre 2026. Couleurs, bandeau du haut, Index, bouton clair/sombre, étiquettes d’artistes, zoom « Moyen », barre du bas en vue mouvement. La croix actuelle est gardée.
 - **Phase 0 · Remettre de l’ordre** · 4 novembre 2026. Fiches orphelines rangées et signalées, README, fin de GitHub Pages (D11), style.css rangé par élément de la page.
-
-## Préparation de la phase 2
-1. Mettre les six documents dans le dépôt, dans `suivi_projet/` (D12). Terminé le 4 novembre 2026.
-2. Ajouter wrangler aux `devDependencies`, à une version exacte (D16). Terminé le 4 novembre 2026 (version 4.157.0).
-3. Trier les « Idées à trier », dans une conversation dédiée (voir plus bas). Reporté le 5 novembre 2026 : à faire avant l’étape 2d, la première qu’elles concernent.
+- **Préparation de la phase 2** · 6 novembre 2026. Documents dans `suivi_projet/` (D12), wrangler fixé en 4.157.0 (D16), structure du site décidée après le tri des idées de Lovable et un prototype de structure (D17 à D28).
 
 ## Phase 2 · Une page par fiche
-Objectif : une page par fiche rédigée (D13), la frise restant à `/` (D14) et identique à aujourd’hui. Une étape = une branche, testée sur l’aperçu Cloudflare avant d’aller dans `main`.
-- **2a · Vérifications.** Terminé le 5 novembre 2026. construire.py signale un lien `[[id]]` vers un identifiant inconnu ou mal formé, un chemin d’image qui ne commence ni par `/` ni par `http`, et une image absente de `public/`. Dans le tableur, le chemin `images/impression-soleil-levant.jpg` devient `/images/impression-soleil-levant.jpg`.
-- **2b · Les données et la frise passent dans Astro.** construire.py écrit `src/data/frise.json` au lieu de `public/data.js` (D7, D8). Le script de la frise devient un module traité par Astro qui lit ces données (D15), sans aucun autre changement. C’est l’étape la plus risquée de la phase : elle se fait seule.
+Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la frise restant à `/` (D17) et identique à aujourd’hui. Une étape = une branche, testée sur l’aperçu Cloudflare avant d’aller dans `main`.
+- **2a · Vérifications.** Terminé le 5 novembre 2026. construire.py signale un lien `[[id]]` vers un identifiant inconnu ou mal formé, un chemin d’image qui ne commence ni par `/` ni par `http`, et une image absente de `public/`.
+- **2b · Les données et la frise passent dans Astro.** construire.py écrit `src/data/frise.json` au lieu de `public/data.js` (D7, D8), et `main()` est découpé. Le script de la frise devient un module traité par Astro qui lit ces données (D15), sans aucun autre changement. C’est l’étape la plus risquée de la phase : elle se fait seule.
 - **2c · Découpage d’app.js.** Les fonctions qui fabriquent les fiches et les outils qu’elles utilisent vont dans `src/lib/`, le reste dans `src/scripts/` (navigation, vues, recherche, Index…). Sans renommage. À trancher à cette étape : `marked` reste-t-il chargé depuis le CDN ?
-- **2d · Les pages.** Un gabarit commun (`Base.astro`) et une page par mouvement, artiste et œuvre rédigés, dans le style du panneau. Les liens `[[id]]` mènent aux pages, et le panneau de la frise propose « Ouvrir la page ».
-- **2e · Référencement de base.** Titre de page, description (le résumé court du tableur), adresse canonique, sitemap.xml, robots.txt. Un contrôle des liens de `dist/` (outil à choisir à cette étape, sans dépendance si possible).
-- **2f · Finitions.** Une page « À propos ». L’Index reçoit les liens vers les nouvelles pages.
+- **2d · Le modèle de données.** Dans le tableur et construire.py, sans rien changer à l’affichage :
+  - un onglet « Groupes » (D22) et une colonne « Groupes » dans l’onglet Artistes ;
+  - l’onglet « Influences » étendu aux mouvements, avec la liste fermée des types (D23) ;
+  - un onglet « Glossaire » (D24) ;
+  - le niveau de chaque œuvre, déduit de sa fiche (D21) ;
+  - les dossiers `fiches/parcours/` et `fiches/comparaisons/`, avec leurs gabarits (D24), et le nouveau gabarit des fiches œuvres (présentation, puis analyse) ;
+  - toutes les vérifications correspondantes, et l’unicité des identifiants étendue aux nouveaux types.
 
-**Terminé quand** : chaque fiche rédigée a sa page ; aucun lien interne n’est cassé (construire.py à l’étape 2a, contrôle de `dist/` à l’étape 2e) ; le sitemap est généré ; la frise fonctionne comme avant, sur ordinateur et sur téléphone.
+  Au passage, Seurat reçoit le groupe `neo-impressionnisme` et « Néo-impressionnisme » sort de ses « Autres mouvements » : l’avertissement actuel disparaît.
+- **2e · Pages mouvements et artistes.** Un gabarit commun (`Base.astro`) avec l’en-tête et le pied de page du site, le fil d’Ariane, les répertoires `/mouvements/` et `/artistes/`, puis les pages, chacune avec sa composition (D25) : repère chronologique, sous-courants et filiations pour les mouvements ; œuvres et liens pour les artistes. Les liens `[[id]]` mènent aux pages ; le panneau de la frise reçoit « Lire la page » (D19) et les pages « Voir dans la frise » (D27). À trancher à cette étape : la forme de l’adresse de la vue mouvement, et l’emplacement des styles des pages (style.css dans `public/`, ou une feuille propre aux pages).
+- **2f · Catalogue et pages œuvres.** Le répertoire `/oeuvres/`, avec ses filtres (mouvement, œuvres majeures, « Écrits et manifestes »), et la page de chaque œuvre documentée, pensée comme un cartel (D21, D25). D10 doit être tranché avant cette étape.
+- **2g · Référencement de base.** Titre de page, description (le résumé court du tableur), adresse canonique, sitemap.xml, robots.txt. Un contrôle des liens de `dist/` (outil à choisir à cette étape, sans dépendance si possible).
+- **2h · Finitions.** La page « À propos » et le plan du site (`/plan-du-site/`). L’Index reçoit les liens vers les nouvelles pages.
 
-## Lot 4 · Version téléphone
+**Terminé quand** : chaque fiche rédigée a sa page ; aucun lien interne n’est cassé (construire.py, puis le contrôle de `dist/` à l’étape 2g) ; le sitemap est généré ; la frise fonctionne comme avant, sur ordinateur et sur téléphone.
+
+## En parallèle · Écriture
+L’écriture n’attend pas le code, et c’est elle qui fixe le rythme du site.
+- Documenter les œuvres majeures (35 aujourd’hui) avec le nouveau gabarit, dès qu’il existe (étape 2d). Ces premières fiches servent aussi à tester la page œuvre.
+- Arrêter la liste des groupes et écrire leur résumé d’une phrase. Pistes tirées des fiches : Die Brücke et Der Blaue Reiter (expressionnisme), néo-impressionnisme et synthétisme (post-impressionnisme), suprématisme et De Stijl (abstraction), action painting et color field (expressionnisme abstrait).
+- Ajouter les relations entre mouvements (filiation, réaction), avec leur explication, et compléter les explications des 12 relations entre artistes.
+- Ajouter au tableur Ball, Eluard, Manet et Miró, avec leurs œuvres, puis ramener leurs fiches de `fiches/_en-attente/` dans `fiches/artistes` et `fiches/oeuvres`. Retirer au passage la section « Sources » des 4 fiches artistes.
+
+## Lot 4 · Version téléphone et en-tête du site
 Phase dédiée, dans sa propre conversation, après la phase 2 et avant l’ouverture au public.
+- L’en-tête de la frise reçoit le menu du site (D18) et l’outil unique « Rechercher », qui réunit la recherche et l’Index (D28), dans un `<dialog>` pour la gestion du focus.
 - Revoir toute l’expérience sur petit écran, pages de la phase 2 comprises.
-- Bandeau : la première ligne devra tenir le titre, l’Index et « Au hasard » ; le bouton de thème est déjà sur la deuxième ligne, à côté de la case « Œuvres majeures seulement ». Piste : ranger « Au hasard » dans le tiroir Index sur téléphone.
+- À trancher : la frise doit-elle s’ouvrir sur le zoom Ensemble lors d’une première visite ?
 - Les règles téléphone ajoutées aux étapes 2a et 2b du lot 3 (libellé court « Au hasard », recherche sur toute la largeur, liste des résultats accrochée à gauche, bouton « Index » dans la même ligne) sont provisoires. La ligne des outils déborde sans doute.
 - Étiquettes d’artistes de la vue mouvement : sur téléphone, les compléments (nombre d’œuvres, nationalité, disciplines, « Surtout ») sont cachés (classe `.complement`). À revoir si l’étiquette s’élargit.
 - Barre du bas : avec les trois boutons de zoom, elle est serrée sur téléphone (libellés à 0,75 rem).
 
-## Après D10
-- Œuvre protégée : message du type « Nous n’avons pas encore les droits pour afficher cette œuvre, mais vous pouvez la retrouver ici », avec un lien. Piste : le « cartel de musée » (voir « Idées à trier »).
-
-## Plus tard : contenu
-- Ajouter le néo-impressionnisme à l’onglet Mouvements (avec sa fiche), puis remplacer « néo-impressionnisme » par son identifiant dans la colonne « Autres mouvements » de Seurat. `construire.py` suggérera l’identifiant.
-- Ajouter au tableur Ball, Eluard, Manet et Miró, avec leurs œuvres, puis ramener leurs fiches de `fiches/_en-attente/` dans `fiches/artistes` et `fiches/oeuvres`. Retirer au passage la section « Sources » des 4 fiches artistes.
-
-## Idées à trier (proposées par Lovable le 3 novembre 2026)
-Ces idées ne sont pas validées. Une conversation dédiée, avant l’étape 2d, décidera de ce qu’on garde, sous quelle forme et dans quelle phase. Pour chaque idée retenue, il faudra aussi dire quel contenu est à rédiger : les sections de contenu demandent surtout de l’écriture. Garder sous la main les captures des maquettes Lovable (hors du dépôt).
-- **Page d’accueil distincte de la frise** (maquette Lovable) : grand titre, image, grille des mouvements, accès à la frise. C’est un changement d’architecture : aujourd’hui, la frise est la page d’accueil. Meilleur pour Google. D14 la reporte : à décider avant la phase 3.
-- **Modèles pour les pages de la phase 2** (maquettes Lovable) : galerie d’œuvres filtrée par mouvement, page mouvement avec son texte, ses artistes et ses œuvres.
-- **Œuvres sans image** : un « cartel de musée » typographique (titre, date, technique, lieu, lien vers le site du musée). Les initiales proposées par Lovable ne conviennent pas (« Vv » pour van Gogh, et les mêmes initiales sur toutes les œuvres d’un artiste).
-- **Fiches de révision** : comparer deux mouvements (contexte, idées, techniques, manifeste, artistes), par exemple fauvisme et expressionnisme.
-- **Lexique & manifestes** : 20 à 30 définitions (pointillisme, primitivisme, ready-made…) et des extraits de manifestes (futurisme, 1909…). Droits à vérifier pour chaque extrait, traductions comprises.
-- **Chronologie des ruptures** : 10 à 15 repères d’histoire générale (Première Guerre mondiale, photographie, tube de peinture…) mis en regard de la frise, sans la surcharger.
-- **Rendre plus visibles deux éléments existants**, que Lovable n’a pas remarqués : le couloir « Contexte » (événements) et la rubrique « Liens » des fiches artistes (influences).
-
 ## Phase 3 · Nom de domaine et ouverture au public
-- Décider de la page d’accueil (D14) : la frise reste-t-elle à `/`, ou une page d’accueil distincte y mène-t-elle ? Dans le second cas, choisir l’adresse de la frise, qui ne changera plus (D9).
+Le contenu minimum à l’ouverture est fixé par D26 : la frise, les mouvements, les artistes, le catalogue et les œuvres documentées, la recherche, sans la rubrique Comprendre.
 - Choisir le nom, acheter le .com et le brancher sur Cloudflare.
+- Rédiger les mentions légales.
 - Ajouter une page 404, un favicon (à la place des logos d’Astro) et un aperçu pour le partage sur les réseaux (Open Graph).
 - Déclarer le site dans Google Search Console.
+- À voir : un outil de mesure d’audience gratuit et sans cookies, pour suivre le nombre de fiches ouvertes chaque semaine.
 
-## Phase 4 · Parcours thématiques
-Format à définir avant de commencer. Les fiches de révision, le lexique et la chronologie des ruptures pourraient en faire partie (voir « Idées à trier »).
+## Phase 4 · Comprendre
+La rubrique de D20, qui n’apparaît dans le menu qu’avec son contenu minimum (D26).
+- L’accueil `/comprendre/`, les gabarits Parcours (article en étapes, qui renvoie aux fiches), Comparer (un tableau rempli depuis le tableur, plus quelques lignes rédigées) et Glossaire (une page, une ancre par terme).
+- Contenu de départ : un parcours pour débuter, par exemple « L’art moderne en neuf étapes », une comparaison et une vingtaine de termes.
+- Idées de Lovable à reprendre ici : « Trois questions pour se vérifier » en fin de page mouvement, « Ne pas confondre », le vrai ou faux justifié, la question transversale, une version imprimable des pages de révision.
 
 ## Phase 5 · Version anglaise
 L’organisation des fichiers et des adresses (`/en/…`) est à décider avant de commencer.
+
+## Après D10
+- Œuvre protégée : message du type « Nous n’avons pas encore les droits pour afficher cette œuvre, mais vous pouvez la retrouver ici », avec un lien vers le site du musée.
+
+## Repoussé, sans date
+- Une page propre pour un groupe qui reçoit un texte développé (D22).
+- Les comparaisons d’artistes et d’œuvres (D20).
+- Depuis une comparaison, ouvrir la frise avec les deux couloirs mis en avant.
+- Le passage du panneau de la frise à une fiche courte (D19).
+- Un graphe visuel des influences.
+- Les repères d’histoire générale (Première Guerre mondiale, photographie, tube de peinture…), affichés dans la frise et non comme une rubrique.
+- Les attributions discutées et les périodes d’activité dans le tableur (D23).
