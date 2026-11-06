@@ -113,3 +113,11 @@ Alternative écartée : garder trois façons de chercher la même chose (le menu
 **D29 · La frise reçoit ses données par un import du JSON** · Décidé (6 novembre 2026)
 `src/scripts/app.js` commence par `import D from "../data/frise.json";`. Au build, Vite intègre les données au script publié dans `dist/_astro/`, sous un nom qui change à chaque modification : un navigateur ne peut plus garder en cache d’anciennes données. Les pages, elles, liront le même fichier au build, dans leur en-tête Astro.
 Alternatives écartées : injecter les données dans la page (`<script type="application/json">`, puis `JSON.parse`), qui ajoute des pièces et oblige à échapper un éventuel `</script>` dans les fiches ; `define:vars`, qui rend le script `is:inline` et lui interdit tout import (contraire à D15).
+
+**D30 · marked est une dépendance npm, en version exacte** · Décidé (6 novembre 2026)
+marked, qui convertit le Markdown des fiches, est installé par npm en version exacte (18.0.14) et importé par `src/lib/fiches.js`. Vite l’intègre au script de la frise, et les pages pourront s’en servir au build : c’est la condition pour que `src/lib/` serve aux deux (D15). Le site ne charge plus rien depuis jsDelivr. On le met à jour quand on le décide, dans une branche testée, comme wrangler (D16).
+Alternative écartée : garder le CDN, qui ne permettait pas de fabriquer le contenu des fiches au build.
+
+**D31 · app.js n’est découpé qu’en ce qui sert aux pages** · Décidé (6 novembre 2026)
+Seuls le contenu des fiches et ses outils sont sortis d’app.js, dans `src/lib/` (`donnees.js`, `outils.js`, `fiches.js`). La navigation, les vues, la recherche, l’Index et le thème restent dans `src/scripts/app.js`, rangés par sections. Rien dans la suite n’a besoin de ce découpage, et c’en était la partie la plus risquée : ordre d’exécution des modules, imports oubliés, imports circulaires. Un fichier déjà connu est plus simple à retoucher qu’une dizaine de modules qui s’importent les uns les autres. Le découpage pourra être repris plus tard, par exemple au lot 4, si app.js devient difficile à lire.
+Alternative écartée : découper app.js en huit modules (état, vues, frise, panneau, survol, en-tête, recherche, thème).

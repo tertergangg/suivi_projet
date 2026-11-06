@@ -12,11 +12,8 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 
 ## À régler pendant la phase 2
 - construire.py fait 271 lignes, et l’étape 2d y ajoute trois onglets et leurs vérifications : envisager alors de séparer la lecture et les vérifications en deux fichiers Python.
-- Des outils d’app.js serviront aussi aux pages (étape 2c) :
-  - `compter()`, rangé dans la section de l’Index, sert déjà ailleurs ;
-  - `NOMS_COURTS` est une donnée rangée dans le code. Si deux artistes d’un même mouvement partagent un nom de famille, les listes de la fiche mouvement les confondront.
-- La hauteur de l’axe (`toile.querySelector(".axe").offsetHeight`) est calculée à deux endroits, `repereVertical()` et `hautRepere()` : à ranger au découpage (étape 2c).
-- La forme d’un lien `[[id]]` est écrite deux fois : dans `verifier_liens()` (construire.py, en Python) et dans `markdown()` (app.js). Le doublon restera après le découpage, puisque construire.py reste en Python. À l’étape 2c, ajouter dans la fonction JavaScript un commentaire qui renvoie à `verifier_liens()`, comme celui-ci renvoie déjà à `markdown()`.
+- `NOMS_COURTS` (src/lib/outils.js) est une donnée rangée dans le code. Si deux artistes d’un même mouvement partagent un nom de famille, les listes de la fiche mouvement les confondront.
+- `lien()` (src/lib/fiches.js) donne toujours `#id`. À l’étape 2e, il devra donner l’adresse de la page, selon le type de l’élément (ARCHITECTURE, partie B, « Liens »).
 
 ## Plus tard, sans urgence
 **Frise**
@@ -31,6 +28,8 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - En-tête : la hauteur du bouton de thème (`2.25rem`) et le `margin-top` de la case « Œuvres majeures seulement » (`0.3rem`) sont calés à la main sur les boutons des mouvements.
 - style.css : `--trait` n’est utilisée nulle part.
 - `verifier_image()` ne voit pas une différence de majuscules entre le tableur et le nom du fichier : Windows les confond, Cloudflare non, et l’image serait cassée en ligne. Garder des noms d’images en minuscules.
+- Astro est noté `^7.4.4` dans `package.json`, alors que marked et wrangler sont en version exacte. `package-lock.json` le protège déjà : à fixer en version exacte par cohérence, dans une branche testée.
+- `ONGLETS_INDEX` (titres des onglets de l’Index) est dans src/lib/outils.js parce que `compter()` en a besoin. À séparer si les pages ont un jour d’autres mots à compter.
 
 **À tester**
 - La coupure d’`aria-live` pendant l’Index n’a pas été testée avec un vrai lecteur d’écran. À faire avant l’ouverture au public.
@@ -50,6 +49,11 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 ---
 
 # Entrées
+
+## 6 novembre 2026 · Étape 2c terminée
+**Fait** : marked passe du CDN à une dépendance npm, dans la même version, fixée en version exacte (18.0.14) : le site ne charge plus rien depuis jsDelivr. Création de `src/lib/` : `donnees.js` (données, accès par identifiant, `couleur`, `mouvementsTries`), `outils.js` (`esc`, `sansAccent`, `nomCourt`, `compter`, `estImage`…) et `fiches.js` (les quatre fonctions `fiche…` et ce qu’elles utilisent). `ficheMouvement()` reçoit un paramètre `avecExplorer` et ne lit plus `etat`. Le reste d’app.js n’est pas découpé (D31). `hauteurAxe()` remplace le calcul fait deux fois, et `markdown()` renvoie maintenant à `verifier_liens()`. Une page de test temporaire, non commitée, a prouvé que `src/lib/` fonctionne au build, dans Node. Testé en local, puis sur la version de test ; fusionné dans `main`.
+**Reste à faire** : l’étape 2d (modèle de données), dans une nouvelle conversation.
+**Décisions prises** : D30, D31.
 
 ## 6 novembre 2026 · Étape 2b terminée
 **Fait** : `main()` de construire.py est découpé en une fonction par onglet (`lire_mouvements()`…), puis `verifier_ensemble()`, `ecrire()` et `afficher_bilan()`. data.js est resté identique avant et après le découpage, ce qui a aussi été vérifié sur un faux tableur qui déclenche les 18 avertissements. construire.py écrit maintenant `src/data/frise.json`, et `public/data.js` est supprimé. app.js est déplacé dans `src/scripts/`, sous le même nom, et devient un module traité par Astro qui importe le JSON (D29). `marked` reste chargé depuis le CDN, avant lui. Une analyse ESLint, hors du dépôt, n’a trouvé aucune variable non déclarée qui casserait le mode strict des modules. Testé en local, puis sur la version de test ; fusionné dans `main`.

@@ -17,7 +17,7 @@ Le détail est dans le JOURNAL et dans l’historique Git.
 Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la frise restant à `/` (D17) et identique à aujourd’hui. Une étape = une branche, testée sur l’aperçu Cloudflare avant d’aller dans `main`.
 - **2a · Vérifications.** Terminé le 5 novembre 2026. construire.py signale un lien `[[id]]` vers un identifiant inconnu ou mal formé, un chemin d’image qui ne commence ni par `/` ni par `http`, et une image absente de `public/`.
 - **2b · Les données et la frise passent dans Astro.** Terminé le 6 novembre 2026. construire.py écrit `src/data/frise.json` et son `main()` est découpé. app.js est déplacé dans `src/scripts/` et devient un module traité par Astro, qui importe le JSON (D29).
-- **2c · Découpage d’app.js.** Les fonctions qui fabriquent les fiches et les outils qu’elles utilisent vont dans `src/lib/`, le reste dans `src/scripts/` (navigation, vues, recherche, Index…). Sans renommage. À trancher à cette étape : `marked` reste-t-il chargé depuis le CDN ?
+- **2c · Découpage d’app.js.** Terminé le 6 novembre 2026, en version réduite (D31). marked passe en dépendance npm (D30). Le contenu des fiches et ses outils vont dans `src/lib/` (`donnees.js`, `outils.js`, `fiches.js`) ; le reste d’app.js n’est pas découpé.
 - **2d · Le modèle de données.** Dans le tableur et construire.py, sans rien changer à l’affichage :
   - un onglet « Groupes » (D22) et une colonne « Groupes » dans l’onglet Artistes ;
   - l’onglet « Influences » étendu aux mouvements, avec la liste fermée des types (D23) ;
@@ -49,6 +49,7 @@ Phase dédiée, dans sa propre conversation, après la phase 2 et avant l’ouve
 - Les règles téléphone ajoutées aux étapes 2a et 2b du lot 3 (libellé court « Au hasard », recherche sur toute la largeur, liste des résultats accrochée à gauche, bouton « Index » dans la même ligne) sont provisoires. La ligne des outils déborde sans doute.
 - Étiquettes d’artistes de la vue mouvement : sur téléphone, les compléments (nombre d’œuvres, nationalité, disciplines, « Surtout ») sont cachés (classe `.complement`). À revoir si l’étiquette s’élargit.
 - Barre du bas : avec les trois boutons de zoom, elle est serrée sur téléphone (libellés à 0,75 rem).
+- À voir : découper la suite d’app.js (D31) si l’ajout du menu et de « Rechercher » le rend difficile à lire.
 
 ## Phase 3 · Nom de domaine et ouverture au public
 Le contenu minimum à l’ouverture est fixé par D26 : la frise, les mouvements, les artistes, le catalogue et les œuvres documentées, la recherche, sans la rubrique Comprendre.

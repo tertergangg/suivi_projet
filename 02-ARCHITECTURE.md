@@ -11,16 +11,16 @@ Ce document décrit le site tel qu’il est (partie A) et tel qu’il doit deven
 donnees/frise_art_moderne_base.xlsx ─┐
                                      ├─> python construire.py ─> src/data/frise.json ─┐
 fiches/<type>/<id>.md ───────────────┘                                                ├─> npm run build ─> dist/
-src/pages/index.astro + src/scripts/app.js + public/ (style.css, images) ─────────────┘
+src/pages/index.astro + src/scripts/app.js + src/lib/ + public/ (style.css, images) ──┘
 ```
-Le site lui-même ne lit ni le tableur ni les fiches : il ne lit que `frise.json`, produit par `construire.py`. Astro transforme `index.astro` en `dist/index.html`. Il intègre `frise.json` au script de la frise et publie ce script dans `dist/_astro/`, sous un nom qui change à chaque modification. Enfin, il copie le dossier `public/` tel quel dans `dist/`.
+Le site lui-même ne lit ni le tableur ni les fiches : il ne lit que `frise.json`, produit par `construire.py`. Astro transforme `index.astro` en `dist/index.html`. Il intègre au script de la frise `frise.json`, les fichiers de `src/lib/` et la librairie marked, puis publie ce script dans `dist/_astro/`, sous un nom qui change à chaque modification. Enfin, il copie le dossier `public/` tel quel dans `dist/`.
 
 ## Arborescence
 C’est l’état de la branche `main`, celle qui est en ligne.
 ```
 README.md                   mode d’emploi (installation, travail sur le contenu, publication)
 construire.py               tableur + fiches -> src/data/frise.json (Python, librairie openpyxl)
-package.json                projet Astro : dépendance astro, wrangler en devDependencies (version exacte, D16), scripts dev, build, preview
+package.json                projet Astro : dépendances astro et marked (version exacte, D30), wrangler en devDependencies (version exacte, D16), scripts dev, build, preview
 package-lock.json           FABRIQUÉ par npm : versions exactes de toutes les dépendances, ne jamais le modifier à la main
 astro.config.mjs            configuration d’Astro (par défaut, vide)
 wrangler.jsonc              configuration Cloudflare : lance npm run build, publie ./dist
@@ -34,7 +34,11 @@ fiches/
   mouvements/  artistes/  oeuvres/     une fiche = un fichier <id>.md
 src/
   pages/index.astro         structure de la page de la frise
-  scripts/app.js            fonctionnement de la frise (≈ 840 lignes), module traité par Astro
+  scripts/app.js            fonctionnement de la frise (≈ 740 lignes), module traité par Astro
+  lib/                      partagé par la frise et les futures pages ; rien n’y touche à la page (D31)
+    donnees.js              importe frise.json ; accès par identifiant (MOUV, ART, OEU, EVT), couleur, mouvementsTries
+    outils.js               esc, sansAccent, nomCourt, compter, estImage…
+    fiches.js               contenu des fiches (ficheOeuvre, ficheArtiste, ficheMouvement, ficheEvenement), avec marked
   data/frise.json           GÉNÉRÉ par construire.py, commité (D8) : ne jamais le modifier à la main
 public/                     copié tel quel dans dist/
   style.css                 apparence (≈ 480 lignes)
@@ -64,7 +68,7 @@ Le tableur contient des listes déroulantes Excel qu’openpyxl ne sait pas lire
    - mouvement, autre mouvement ou artiste inconnu, avec l’identifiant suggéré quand c’est possible ;
    - fiche manquante, année manquante, identifiant en double ;
    - fiche sans ligne dans le tableur (`verifier_orphelines()`, qui ne parcourt pas les sous-dossiers) ;
-   - lien `[[id]]` vers un identifiant inconnu, ou mal formé (`verifier_liens()`, même règle que `markdown()` dans app.js) ;
+   - lien `[[id]]` vers un identifiant inconnu, ou mal formé (`verifier_liens()`, même règle que `markdown()` dans `src/lib/fiches.js`) ;
    - chemin d’image relatif, ou image absente de `public/` (`verifier_image()`).
 5. Écrit `src/data/frise.json`, un objet JSON `{ mouvements, artistes, oeuvres, evenements, influences }`.
 
@@ -82,16 +86,17 @@ Le tableur contient des listes déroulantes Excel qu’openpyxl ne sait pas lire
 Le champ `fiche` contient le Markdown de la fiche, ou une chaîne vide si elle n’est pas rédigée.
 
 ## index.astro
-La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant l’affichage, l’en-tête, le bandeau de la vue mouvement, la zone qui défile, la barre du bas, la bulle, le panneau et le `<dialog>` de l’image en grand. Deux scripts terminent la page. `marked` est chargé depuis le CDN en `is:inline` : Astro le publie sans le transformer. Puis vient `src/scripts/app.js`, sans `is:inline` : Astro le traite comme un module, résout son import de `frise.json` et le publie dans `dist/_astro/`. Un module s’exécute à la fin de la lecture de la page, donc après `marked`.
+La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant l’affichage, l’en-tête, le bandeau de la vue mouvement, la zone qui défile, la barre du bas, la bulle, le panneau et le `<dialog>` de l’image en grand. Un seul script termine la page : `src/scripts/app.js`, sans `is:inline`. Astro le traite comme un module, résout ses imports (`frise.json`, `src/lib/`, marked) et le publie dans `dist/_astro/`.
 
-## app.js (src/scripts/)
-- Importe ses données (`import D from "../data/frise.json"`, D29). C’est un module : il s’exécute en mode strict, et ses fonctions ne sont pas globales. L’objet `REGLAGES`, en tête du fichier, réunit les réglages modifiables : période affichée, année de départ, échelle et largeur des cartes aux zooms « Détail » et « Moyen », hauteur des lignes, marges de la vue mouvement.
+## app.js (src/scripts/) et src/lib/
+- **`src/lib/`** contient ce qui servira aussi aux pages : les données (`donnees.js`), les petits outils (`outils.js`) et le contenu des fiches (`fiches.js`). Rien n’y touche à la page (ni `document` ni `window`), pour que ces fichiers fonctionnent au build, dans Node. Un fichier n’exporte que ce dont un autre a besoin. La frise passe à `ficheMouvement(m, avecExplorer)` l’information qu’elle seule connaît.
+- **app.js** importe ses données et le contenu des fiches depuis `src/lib/` (D29, D31). C’est un module : il s’exécute en mode strict, et ses fonctions ne sont pas globales. L’objet `REGLAGES`, en tête du fichier, réunit les réglages modifiables : période affichée, année de départ, échelle et largeur des cartes aux zooms « Détail » et « Moyen », hauteur des lignes, marges de la vue mouvement.
 - **Un état, un dessin.** L’objet `etat` dit ce qui est affiché (vue, mouvement, zoom Moyen, case « Œuvres majeures seulement »). `dessiner()` refait tout le HTML de la frise à partir de cet état, et `fenetre()` calcule la période et l’échelle.
 - **Trois vues** : « détail » (la frise complète, un couloir par mouvement, une carte par œuvre, vue par défaut), « ensemble » (toute la période sans défilement, une bande par mouvement), « mouvement » (un mouvement en grand, une ligne par artiste). Le zoom « Moyen » n’est pas une quatrième vue : c’est la vue détail resserrée (`etat.moyen`), dont seule `fenetre()` tient compte.
 - **Navigation** : glisser à la souris, flèches du clavier, barre du bas (trois boutons de zoom, puis des repères : les décennies, ou des années en vue mouvement), sommaire des mouvements, recherche insensible aux accents, bouton « Une œuvre au hasard ».
-- **Panneau** : il affiche une fiche ou l’Index. Le HTML des fiches est fabriqué par `ficheOeuvre`, `ficheArtiste`, `ficheMouvement` et `ficheEvenement`. S’y ajoutent la bulle d’aperçu au survol d’une œuvre et l’image en grand (`<dialog>`).
+- **Panneau** : il affiche une fiche, dont le HTML vient de `src/lib/fiches.js`, ou l’Index. S’y ajoutent la bulle d’aperçu au survol d’une œuvre et l’image en grand (`<dialog>`).
 - **Liens internes** : `[[id]]` ou `[[id|texte]]` devient un lien `#id`. Une fiche ouverte met `#id` dans l’adresse ; une adresse en `#id` ouvre la fiche.
-- **Markdown** converti dans le navigateur par `marked`, chargé depuis jsDelivr (version 18.0.14).
+- **Markdown** converti par marked, dépendance npm intégrée au script (D30).
 - **Thème** : le bouton inverse `data-theme` sur `<html>` et mémorise le choix (`localStorage`, clé `theme`).
 - **Accessibilité**, à préserver : attributs ARIA, focus visible, navigation au clavier, respect de `prefers-reduced-motion`, `aria-live` du panneau coupé pendant l’Index.
 
@@ -104,20 +109,20 @@ La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant
 À chaque push, Cloudflare installe les dépendances, puis lance la Deploy command `npx wrangler deploy`. Wrangler lit le bloc `build` de `wrangler.jsonc`, lance `npm run build`, puis publie `./dist`. Dans le tableau de bord, la Build command de l’onglet Production reste vide, sans quoi le site serait fabriqué deux fois.
 - Branche de production : `main`. Adresse : https://frise-chronologique---art-moderne.tjimblet.workers.dev
 - Les autres branches ont une version de test (encadré « Previews »), publiée par `wrangler preview` (commande en bêta) grâce au bloc `"previews": {}`.
-- wrangler est fixé à une version exacte dans les `devDependencies` (4.157.0, D16) : `npx wrangler deploy` utilise cette version, installée avec le reste. On la change seulement par choix, dans une branche testée.
+- wrangler est fixé à une version exacte dans les `devDependencies` (4.157.0, D16) : `npx wrangler deploy` utilise cette version, installée avec le reste. On la change seulement par choix, dans une branche testée. marked l’est aussi, dans les `dependencies` (18.0.14, D30).
 - GitHub Pages est désactivé : l’ancienne adresse en github.io renvoie une erreur 404 (D11).
 
 ---
 
 # B. Architecture cible : le site complet (phase 2 et suivantes)
 
-Les choix de cette partie sont fixés par D17 à D28. Un prototype de structure, publié sur claude.ai le 6 novembre 2026 et rangé hors du dépôt, en donne une image cliquable ; il est antérieur aux décisions D20 à D22 et montre encore une sous-rubrique « Textes ».
+Les choix de cette partie sont fixés par D17 à D31. Un prototype de structure, publié sur claude.ai le 6 novembre 2026 et rangé hors du dépôt, en donne une image cliquable ; il est antérieur aux décisions D20 à D22 et montre encore une sous-rubrique « Textes ».
 
 ## Principes
 1. **Les sources ne bougent pas.** Le tableur et les fiches restent la source de vérité et se modifient comme aujourd’hui (D5).
-2. **construire.py reste la porte d’entrée des données** et garde toutes ses vérifications (D7). Il écrira `src/data/frise.json`, commité (D8).
+2. **construire.py reste la porte d’entrée des données** et garde toutes ses vérifications (D7). Il écrit `src/data/frise.json`, commité (D8).
 3. **Astro génère des pages HTML statiques** : la frise, plus une page par fiche rédigée (D13, D21). Pas de serveur ni de base de données.
-4. **La frise garde sa logique et son apparence**, et reste l’accueil (D17). Son script devient un module traité par Astro, sans réécriture (D15).
+4. **La frise garde sa logique et son apparence**, et reste l’accueil (D17). Son script est un module traité par Astro, sans réécriture (D15).
 5. **Un outil, une question ; un texte, une page** (D19). Les listes sont calculées, jamais écrites.
 6. **Une seule fabrique pour les fiches.** Les fonctions qui produisent le contenu d’une fiche sont dans `src/lib/` et servent au panneau comme aux pages.
 7. **Une rubrique n’apparaît qu’avec son contenu** (D18).
@@ -202,8 +207,8 @@ src/
     oeuvres/index.astro       catalogue ; oeuvres/[id].astro : une page par œuvre documentée
     a-propos.astro  plan-du-site.astro
     comprendre/…              phase 4
-  scripts/                    l’ancien app.js, découpé (navigation, vues, recherche, Index…)
-  lib/                        partagé par la frise et les pages : contenu des fiches, liens [[id]], Markdown, outils (esc, nomCourt, compter…)
+  scripts/app.js              la frise : navigation, vues, recherche, Index (D31)
+  lib/                        partagé par la frise et les pages : données, outils (esc, nomCourt, compter…), contenu des fiches, liens [[id]], Markdown
 ```
 
 ## Ce qui est déjà décidé
@@ -211,23 +216,23 @@ src/
 - **Rubriques et adresses** : D18. **Comprendre** : D20, ouverte après le lancement (D26).
 - **Pages** : seulement pour les fiches rédigées (D13) ; pour une œuvre, dès qu’elle est documentée (D21).
 - **Script de la frise** : un module traité par Astro, qui partage `src/lib/` avec les pages (D15).
-- **Données de la frise** : le module importe `src/data/frise.json` (D29).
-- **Liens** : une seule fonction de `src/lib/` transforme `[[id]]`. Dans le panneau de la frise, elle donne `#id`. Sur les pages, elle donne `/<type>/<id>/` si la fiche est rédigée, `/mouvements/<mouvement>/#<id>` pour un groupe, `/comprendre/glossaire/#<id>` pour un terme, `/#id` sinon.
+- **Données de la frise** : le module importe `src/data/frise.json`, par l’intermédiaire de `src/lib/donnees.js` (D29).
+- **Liens** : une seule fonction de `src/lib/` transforme `[[id]]`. Dans le panneau de la frise, elle donne `#id`. Sur les pages, elle donnera `/<type>/<id>/` si la fiche est rédigée, `/mouvements/<mouvement>/#<id>` pour un groupe, `/comprendre/glossaire/#<id>` pour un terme, `/#id` sinon.
 - **Images** : chemins absolus (`/images/…`), vérifiés par construire.py, pour fonctionner à toutes les profondeurs d’adresse.
-- **Découpage d’app.js** : sans renommage. `majDecennies()`, `.decennie` et `#decennies` gardent leur nom.
+- **Découpage d’app.js** : seuls le contenu des fiches et ses outils sont dans `src/lib/` (D31), sans renommage. `majDecennies()`, `.decennie` et `#decennies` gardent leur nom.
+- **Markdown** : marked, dépendance npm, utilisé par la frise et au build (D30).
 - **Recherche** : un seul outil, au lot 4 (D28).
 
 ## Points à trancher, à l’étape indiquée (voir ROADMAP)
-- **2c · Markdown** : `marked` reste-t-il chargé depuis le CDN, ou devient-il une dépendance npm, utilisée au build pour les pages et dans la frise ? La seconde option retire le CDN sans changer de librairie.
 - **2d · Analyse d’une œuvre** : le titre de section qui marque le niveau « analysée ».
 - **2e · Vue mouvement** : la forme de son adresse (D27), sachant que `/#id` ouvre aujourd’hui la fiche dans la vue détail.
 - **2e · Styles** : style.css reste-t-il dans `public/`, lié tel quel, avec les règles des pages ajoutées par section ? Ou les pages ont-elles leur propre feuille ? Le plus simple est de garder un seul fichier.
 - **2f · Images** : D10, avant le catalogue.
-- **Lot 4** : le zoom affiché lors d’une première visite.
+- **Lot 4** : le zoom affiché lors d’une première visite ; le découpage de la suite d’app.js, si besoin (D31).
 - **Après la phase 2** : le passage du panneau de la frise à une fiche courte (D19).
 
 ## Phase 5
 L’organisation des fichiers pour la version anglaise (`/en/…`) est à décider avant de commencer, pas pendant.
 
 ## Déploiement visé
-C’est déjà le cas depuis la phase 1 : Cloudflare lance `npm run build` (via `wrangler.jsonc`) et publie le dossier `./dist`. Comme `frise.json` sera commité, Cloudflare n’aura besoin ni de Python ni du tableur.
+C’est déjà le cas depuis la phase 1 : Cloudflare lance `npm run build` (via `wrangler.jsonc`) et publie le dossier `./dist`. Comme `frise.json` est commité, Cloudflare n’a besoin ni de Python ni du tableur.
