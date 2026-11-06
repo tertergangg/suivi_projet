@@ -125,3 +125,16 @@ Alternative écartée : découper app.js en huit modules (état, vues, frise, pa
 **D32 · construire.py reste un seul fichier** · Décidé (6 novembre 2026)
 Les nouvelles lectures et vérifications de l’étape 2d s’ajoutent à construire.py, qui garde une fonction de lecture par onglet. Ces fonctions font déjà leurs propres vérifications : les séparer obligerait à faire circuler `avertir()` et les identifiants entre deux fichiers. C’est le même raisonnement que D31. À reconsidérer si le fichier devient difficile à lire.
 Alternative écartée : séparer la lecture et les vérifications en deux fichiers Python.
+
+**D33 Ignorer.
+
+**D34 · Le titre « ## Analyse » marque l’analyse d’une fiche œuvre** · Décidé (6 novembre 2026)
+Dans une fiche œuvre, ce qui précède `## Analyse` est la présentation ; ce qui suit est l’analyse, dont les rubriques sont des titres `###`. construire.py en déduit le niveau de l’œuvre (D21), écrit dans la clé `niveau` de frise.json : `referencee` (fiche vide), `documentee` ou `analysee`. Une analyse sans vrai texte est retirée du Markdown, pour que son titre ne s’affiche pas seul. Ce titre ne se renomme plus une fois des fiches écrites.
+Alternative écartée : une colonne « Niveau » dans le tableur, qui pourrait contredire le texte (D21).
+
+**D35 · L’en-tête des parcours et des comparaisons se lit sans librairie YAML** · Décidé (6 novembre 2026)
+Les identifiants reliés s’écrivent sur une seule ligne, séparés par des virgules, comme dans le tableur : `etapes: impressionnisme, monet` ou `elements: fauvisme, expressionnisme`. construire.py lit lui-même ces lignes `clé: valeur`. Le format reste du YAML valide. L’identifiant est le nom du fichier et doit être celui de l’en-tête ; le titre est la ligne `#`.
+Alternative écartée : PyYAML, une dépendance de plus pour quatre champs.
+
+**D36 · Une comparaison relie deux éléments du même genre** · Décidé (6 novembre 2026)
+Deux mouvements, deux artistes ou deux œuvres, jamais un mélange : cela précise D20. Un parcours a au moins deux étapes, de n’importe quel type. Le « Voir aussi » d’un terme du glossaire peut viser n’importe quel identifiant.

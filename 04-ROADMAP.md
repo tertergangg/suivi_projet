@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : phase 2, étape 2d.** La structure du site est fixée (D17 à D28). Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
+**Étape en cours : phase 2, étape 2e.** La structure du site est fixée (D17 à D28) et le modèle de données est en place (étape 2d). Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
 
 ---
 
@@ -18,12 +18,7 @@ Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la
 - **2a · Vérifications.** Terminé le 5 novembre 2026. construire.py signale un lien `[[id]]` vers un identifiant inconnu ou mal formé, un chemin d’image qui ne commence ni par `/` ni par `http`, et une image absente de `public/`.
 - **2b · Les données et la frise passent dans Astro.** Terminé le 6 novembre 2026. construire.py écrit `src/data/frise.json` et son `main()` est découpé. app.js est déplacé dans `src/scripts/` et devient un module traité par Astro, qui importe le JSON (D29).
 - **2c · Découpage d’app.js.** Terminé le 6 novembre 2026, en version réduite (D31). marked passe en dépendance npm (D30). Le contenu des fiches et ses outils vont dans `src/lib/` (`donnees.js`, `outils.js`, `fiches.js`) ; le reste d’app.js n’est pas découpé.
-- **2d · Le modèle de données.** En cours, sur la branche `modele-donnees`. Dans le tableur et construire.py, sans rien changer à l’affichage, en cinq sous-étapes :
-  1. un onglet « Groupes » (D22) et une colonne « Groupes » dans l’onglet Artistes. Terminé le 6 novembre 2026 : Seurat a reçu le groupe `neo-impressionnisme`, et l’avertissement sur ses « Autres mouvements » a disparu ;
-  2. l’onglet « Influences » étendu aux mouvements, avec la liste fermée des types (D23). Terminé le 6 novembre 2026 ;
-  3. un onglet « Glossaire » (D24) ;
-  4. le niveau de chaque œuvre, déduit de sa fiche (D21), et le nouveau gabarit des fiches œuvres (présentation, puis analyse). Le titre qui marque l’analyse est à trancher à cette sous-étape ;
-  5. les dossiers `fiches/parcours/` et `fiches/comparaisons/`, avec leurs gabarits (D24).
+- **2d · Le modèle de données.** Terminé le 6 novembre 2026, sur la branche `modele-donnees`, en cinq sous-étapes et sans rien changer à l’affichage : onglet « Groupes » et colonne « Groupes » des artistes (D22) ; relations typées entre artistes et mouvements (D23) ; onglet « Glossaire » (D24) ; niveau des œuvres déduit de leur fiche, avec le gabarit en deux parties (D21, D34) ; gabarits des parcours et des comparaisons (D24, D35, D36).
 
   À chaque sous-étape, les vérifications correspondantes, et l’unicité des identifiants étendue aux nouveaux types. La branche est testée sur la version de test, puis fusionnée dans `main`, une fois les cinq sous-étapes terminées.
 - **2e · Pages mouvements et artistes.** Un gabarit commun (`Base.astro`) avec l’en-tête et le pied de page du site, le fil d’Ariane, les répertoires `/mouvements/` et `/artistes/`, puis les pages, chacune avec sa composition (D25) : repère chronologique, sous-courants et filiations pour les mouvements ; œuvres et liens pour les artistes. Les liens `[[id]]` mènent aux pages ; le panneau de la frise reçoit « Lire la page » (D19) et les pages « Voir dans la frise » (D27). À trancher à cette étape : la forme de l’adresse de la vue mouvement, et l’emplacement des styles des pages (style.css dans `public/`, ou une feuille propre aux pages).
@@ -35,7 +30,7 @@ Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la
 
 ## En parallèle · Écriture
 L’écriture n’attend pas le code, et c’est elle qui fixe le rythme du site.
-- Documenter les œuvres majeures (35 aujourd’hui) avec le nouveau gabarit, dès qu’il existe (étape 2d). Ces premières fiches servent aussi à tester la page œuvre.
+- Documenter les œuvres majeures (35 aujourd’hui). Les 104 fiches œuvres sont au nouveau gabarit : la présentation suffit, l’analyse sous `## Analyse` est facultative (D34). Ces premières fiches servent aussi à tester la page œuvre (étape 2f).
 - Arrêter la liste des groupes et écrire leur résumé d’une phrase, dans l’onglet « Groupes » du tableur (seul le néo-impressionnisme y est), puis remplir la colonne « Groupes » des artistes concernés. Pistes tirées des fiches : Die Brücke et Der Blaue Reiter (expressionnisme), néo-impressionnisme et synthétisme (post-impressionnisme), suprématisme et De Stijl (abstraction), action painting et color field (expressionnisme abstrait).
 - Ajouter les relations entre mouvements (filiation, réaction), avec leur explication, et compléter les explications des 12 relations entre artistes.
 - Ajouter au tableur Ball, Eluard, Manet et Miró, avec leurs œuvres, puis ramener leurs fiches de `fiches/_en-attente/` dans `fiches/artistes` et `fiches/oeuvres`. Retirer au passage la section « Sources » des 4 fiches artistes.
