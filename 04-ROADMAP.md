@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : préparation de la phase 2.** Il reste à trier les « Idées à trier », dans une conversation dédiée. Viennent ensuite la phase 2, le lot 4 (téléphone), puis la phase 3 (ouverture au public).
+**Étape en cours : phase 2, étape 2b.** Le tri des « Idées à trier » est reporté, et doit être fait avant l’étape 2d. Viennent ensuite le lot 4 (téléphone), puis la phase 3 (ouverture au public).
 
 ---
 
@@ -15,11 +15,11 @@ Le détail est dans le JOURNAL et dans l’historique Git.
 ## Préparation de la phase 2
 1. Mettre les six documents dans le dépôt, dans `suivi_projet/` (D12). Terminé le 4 novembre 2026.
 2. Ajouter wrangler aux `devDependencies`, à une version exacte (D16). Terminé le 4 novembre 2026 (version 4.157.0).
-3. Trier les « Idées à trier », dans une conversation dédiée (voir plus bas).
+3. Trier les « Idées à trier », dans une conversation dédiée (voir plus bas). Reporté le 5 novembre 2026 : à faire avant l’étape 2d, la première qu’elles concernent.
 
 ## Phase 2 · Une page par fiche
 Objectif : une page par fiche rédigée (D13), la frise restant à `/` (D14) et identique à aujourd’hui. Une étape = une branche, testée sur l’aperçu Cloudflare avant d’aller dans `main`.
-- **2a · Vérifications.** construire.py signale un lien `[[id]]` vers un identifiant inconnu, et un chemin d’image qui ne commence ni par `/` ni par `http`. Dans le tableur, le chemin `images/impression-soleil-levant.jpg` devient `/images/impression-soleil-levant.jpg` : un chemin relatif casserait sur les pages comme `/oeuvres/…/`.
+- **2a · Vérifications.** Terminé le 5 novembre 2026. construire.py signale un lien `[[id]]` vers un identifiant inconnu ou mal formé, un chemin d’image qui ne commence ni par `/` ni par `http`, et une image absente de `public/`. Dans le tableur, le chemin `images/impression-soleil-levant.jpg` devient `/images/impression-soleil-levant.jpg`.
 - **2b · Les données et la frise passent dans Astro.** construire.py écrit `src/data/frise.json` au lieu de `public/data.js` (D7, D8). Le script de la frise devient un module traité par Astro qui lit ces données (D15), sans aucun autre changement. C’est l’étape la plus risquée de la phase : elle se fait seule.
 - **2c · Découpage d’app.js.** Les fonctions qui fabriquent les fiches et les outils qu’elles utilisent vont dans `src/lib/`, le reste dans `src/scripts/` (navigation, vues, recherche, Index…). Sans renommage. À trancher à cette étape : `marked` reste-t-il chargé depuis le CDN ?
 - **2d · Les pages.** Un gabarit commun (`Base.astro`) et une page par mouvement, artiste et œuvre rédigés, dans le style du panneau. Les liens `[[id]]` mènent aux pages, et le panneau de la frise propose « Ouvrir la page ».
@@ -44,7 +44,7 @@ Phase dédiée, dans sa propre conversation, après la phase 2 et avant l’ouve
 - Ajouter au tableur Ball, Eluard, Manet et Miró, avec leurs œuvres, puis ramener leurs fiches de `fiches/_en-attente/` dans `fiches/artistes` et `fiches/oeuvres`. Retirer au passage la section « Sources » des 4 fiches artistes.
 
 ## Idées à trier (proposées par Lovable le 3 novembre 2026)
-Ces idées ne sont pas validées. Une conversation dédiée, avant le début de la phase 2, décidera de ce qu’on garde, sous quelle forme et dans quelle phase. Pour chaque idée retenue, il faudra aussi dire quel contenu est à rédiger : les sections de contenu demandent surtout de l’écriture. Garder sous la main les captures des maquettes Lovable (hors du dépôt).
+Ces idées ne sont pas validées. Une conversation dédiée, avant l’étape 2d, décidera de ce qu’on garde, sous quelle forme et dans quelle phase. Pour chaque idée retenue, il faudra aussi dire quel contenu est à rédiger : les sections de contenu demandent surtout de l’écriture. Garder sous la main les captures des maquettes Lovable (hors du dépôt).
 - **Page d’accueil distincte de la frise** (maquette Lovable) : grand titre, image, grille des mouvements, accès à la frise. C’est un changement d’architecture : aujourd’hui, la frise est la page d’accueil. Meilleur pour Google. D14 la reporte : à décider avant la phase 3.
 - **Modèles pour les pages de la phase 2** (maquettes Lovable) : galerie d’œuvres filtrée par mouvement, page mouvement avec son texte, ses artistes et ses œuvres.
 - **Œuvres sans image** : un « cartel de musée » typographique (titre, date, technique, lieu, lien vers le site du musée). Les initiales proposées par Lovable ne conviennent pas (« Vv » pour van Gogh, et les mêmes initiales sur toutes les œuvres d’un artiste).

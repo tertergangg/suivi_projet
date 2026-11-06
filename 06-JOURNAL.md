@@ -16,6 +16,7 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
   - `compter()`, rangé dans la section de l’Index, sert déjà ailleurs ;
   - `NOMS_COURTS` est une donnée rangée dans le code. Si deux artistes d’un même mouvement partagent un nom de famille, les listes de la fiche mouvement les confondront.
 - La hauteur de l’axe (`toile.querySelector(".axe").offsetHeight`) est calculée à deux endroits, `repereVertical()` et `hautRepere()` : à ranger au découpage (étape 2c).
+- La forme d’un lien `[[id]]` est écrite deux fois : dans `verifier_liens()` (construire.py, en Python) et dans `markdown()` (app.js). Le doublon restera après le découpage, puisque construire.py reste en Python. À l’étape 2c, ajouter dans la fonction JavaScript un commentaire qui renvoie à `verifier_liens()`, comme celui-ci renvoie déjà à `markdown()`.
 
 ## Plus tard, sans urgence
 **Frise**
@@ -29,6 +30,7 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - Thème : la clé `theme` et les valeurs `light`/`dark` sont écrites à deux endroits (script du `<head>` et app.js). Après un clic, la bulle du bouton garde l’ancien libellé jusqu’au survol suivant.
 - En-tête : la hauteur du bouton de thème (`2.25rem`) et le `margin-top` de la case « Œuvres majeures seulement » (`0.3rem`) sont calés à la main sur les boutons des mouvements.
 - style.css : `--trait` n’est utilisée nulle part.
+- `verifier_image()` ne voit pas une différence de majuscules entre le tableur et le nom du fichier : Windows les confond, Cloudflare non, et l’image serait cassée en ligne. Garder des noms d’images en minuscules.
 
 **À tester**
 - La coupure d’`aria-live` pendant l’Index n’a pas été testée avec un vrai lecteur d’écran. À faire avant l’ouverture au public.
@@ -48,6 +50,11 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 ---
 
 # Entrées
+
+## 5 novembre 2026 · Étape 2a terminée
+**Fait** : le tri des « Idées à trier » est reporté, car il ne concerne que l’étape 2d et la suite. construire.py vérifie maintenant les liens des fiches (`verifier_liens()`) : identifiant inconnu, ou lien mal formé que la fonction `markdown()` d’app.js ne reconnaîtrait pas. Il vérifie aussi les chemins d’images (`verifier_image()`) : chemin qui ne commence ni par `/` ni par `http`, ou fichier absent de `public/`. Ce second contrôle va un peu au-delà de la roadmap. Dans le tableur, l’image d’*Impression, soleil levant* passe à `/images/…`. Testé avec de faux liens, puis sur la version de test ; fusionné dans `main`.
+**Reste à faire** : l’étape 2b, dans une nouvelle conversation. Le tri des idées, avant l’étape 2d.
+**Décisions prises** : aucune.
 
 ## 4 novembre 2026 · Version de wrangler fixée
 **Fait** : wrangler ajouté aux `devDependencies` en version exacte 4.157.0, celle du dernier déploiement de production réussi (`npm install --save-dev --save-exact`). `package-lock.json` mis à jour et commité. Vérifié par une simulation locale (`npx wrangler deploy --dry-run`), puis sur la version de test et en production : le log affiche `wrangler 4.157.0`. Le nom du dossier des documents est corrigé partout : `suivi_projet/`, et non `projet/`.

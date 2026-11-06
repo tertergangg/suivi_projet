@@ -60,7 +60,12 @@ Le tableur contient des listes déroulantes Excel qu’openpyxl ne sait pas lire
 1. Lit les cinq onglets.
 2. Pour chaque mouvement, artiste et œuvre, lit `fiches/<dossier>/<id>.md`, sans l’en-tête YAML, le premier titre `#` et les commentaires `<!-- -->`. Une fiche de moins d’une vingtaine de caractères de vrai texte est considérée comme vide : le site affiche alors « fiche à venir ».
 3. Met en forme les textes affichés, jamais les identifiants : apostrophe typographique (`typo`, pas sur le Markdown des fiches), majuscule initiale de la nationalité et du rôle (`majuscule`), découpage de « Autres mouvements » en liste (`lire_autres`).
-4. Vérifie la cohérence et affiche des avertissements (`avertir()`) : mouvement, autre mouvement ou artiste inconnu (avec l’identifiant suggéré quand c’est possible), fiche manquante, année manquante, identifiant en double, fiche sans ligne dans le tableur (`verifier_orphelines()`, qui ne parcourt pas les sous-dossiers).
+4. Vérifie la cohérence et affiche des avertissements (`avertir()`) :
+   - mouvement, autre mouvement ou artiste inconnu, avec l’identifiant suggéré quand c’est possible ;
+   - fiche manquante, année manquante, identifiant en double ;
+   - fiche sans ligne dans le tableur (`verifier_orphelines()`, qui ne parcourt pas les sous-dossiers) ;
+   - lien `[[id]]` vers un identifiant inconnu, ou mal formé (`verifier_liens()`, même règle que `markdown()` dans app.js) ;
+   - chemin d’image relatif, ou image absente de `public/` (`verifier_image()`).
 5. Écrit `public/data.js` sous la forme `window.FRISE = { mouvements, artistes, oeuvres, evenements, influences }`.
 
 ## Format des données (window.FRISE)
