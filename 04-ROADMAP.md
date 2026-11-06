@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : phase 2, étape 2c.** La structure du site est fixée (D17 à D28). Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
+**Étape en cours : phase 2, étape 2d.** La structure du site est fixée (D17 à D28). Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
 
 ---
 
@@ -18,15 +18,14 @@ Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la
 - **2a · Vérifications.** Terminé le 5 novembre 2026. construire.py signale un lien `[[id]]` vers un identifiant inconnu ou mal formé, un chemin d’image qui ne commence ni par `/` ni par `http`, et une image absente de `public/`.
 - **2b · Les données et la frise passent dans Astro.** Terminé le 6 novembre 2026. construire.py écrit `src/data/frise.json` et son `main()` est découpé. app.js est déplacé dans `src/scripts/` et devient un module traité par Astro, qui importe le JSON (D29).
 - **2c · Découpage d’app.js.** Terminé le 6 novembre 2026, en version réduite (D31). marked passe en dépendance npm (D30). Le contenu des fiches et ses outils vont dans `src/lib/` (`donnees.js`, `outils.js`, `fiches.js`) ; le reste d’app.js n’est pas découpé.
-- **2d · Le modèle de données.** Dans le tableur et construire.py, sans rien changer à l’affichage :
-  - un onglet « Groupes » (D22) et une colonne « Groupes » dans l’onglet Artistes ;
-  - l’onglet « Influences » étendu aux mouvements, avec la liste fermée des types (D23) ;
-  - un onglet « Glossaire » (D24) ;
-  - le niveau de chaque œuvre, déduit de sa fiche (D21) ;
-  - les dossiers `fiches/parcours/` et `fiches/comparaisons/`, avec leurs gabarits (D24), et le nouveau gabarit des fiches œuvres (présentation, puis analyse) ;
-  - toutes les vérifications correspondantes, et l’unicité des identifiants étendue aux nouveaux types.
+- **2d · Le modèle de données.** En cours, sur la branche `modele-donnees`. Dans le tableur et construire.py, sans rien changer à l’affichage, en cinq sous-étapes :
+  1. un onglet « Groupes » (D22) et une colonne « Groupes » dans l’onglet Artistes. Terminé le 6 novembre 2026 : Seurat a reçu le groupe `neo-impressionnisme`, et l’avertissement sur ses « Autres mouvements » a disparu ;
+  2. l’onglet « Influences » étendu aux mouvements, avec la liste fermée des types (D23). Terminé le 6 novembre 2026 ;
+  3. un onglet « Glossaire » (D24) ;
+  4. le niveau de chaque œuvre, déduit de sa fiche (D21), et le nouveau gabarit des fiches œuvres (présentation, puis analyse). Le titre qui marque l’analyse est à trancher à cette sous-étape ;
+  5. les dossiers `fiches/parcours/` et `fiches/comparaisons/`, avec leurs gabarits (D24).
 
-  Au passage, Seurat reçoit le groupe `neo-impressionnisme` et « Néo-impressionnisme » sort de ses « Autres mouvements » : l’avertissement actuel disparaît.
+  À chaque sous-étape, les vérifications correspondantes, et l’unicité des identifiants étendue aux nouveaux types. La branche est testée sur la version de test, puis fusionnée dans `main`, une fois les cinq sous-étapes terminées.
 - **2e · Pages mouvements et artistes.** Un gabarit commun (`Base.astro`) avec l’en-tête et le pied de page du site, le fil d’Ariane, les répertoires `/mouvements/` et `/artistes/`, puis les pages, chacune avec sa composition (D25) : repère chronologique, sous-courants et filiations pour les mouvements ; œuvres et liens pour les artistes. Les liens `[[id]]` mènent aux pages ; le panneau de la frise reçoit « Lire la page » (D19) et les pages « Voir dans la frise » (D27). À trancher à cette étape : la forme de l’adresse de la vue mouvement, et l’emplacement des styles des pages (style.css dans `public/`, ou une feuille propre aux pages).
 - **2f · Catalogue et pages œuvres.** Le répertoire `/oeuvres/`, avec ses filtres (mouvement, œuvres majeures, « Écrits et manifestes »), et la page de chaque œuvre documentée, pensée comme un cartel (D21, D25). D10 doit être tranché avant cette étape.
 - **2g · Référencement de base.** Titre de page, description (le résumé court du tableur), adresse canonique, sitemap.xml, robots.txt. Un contrôle des liens de `dist/` (outil à choisir à cette étape, sans dépendance si possible).
@@ -37,7 +36,7 @@ Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la
 ## En parallèle · Écriture
 L’écriture n’attend pas le code, et c’est elle qui fixe le rythme du site.
 - Documenter les œuvres majeures (35 aujourd’hui) avec le nouveau gabarit, dès qu’il existe (étape 2d). Ces premières fiches servent aussi à tester la page œuvre.
-- Arrêter la liste des groupes et écrire leur résumé d’une phrase. Pistes tirées des fiches : Die Brücke et Der Blaue Reiter (expressionnisme), néo-impressionnisme et synthétisme (post-impressionnisme), suprématisme et De Stijl (abstraction), action painting et color field (expressionnisme abstrait).
+- Arrêter la liste des groupes et écrire leur résumé d’une phrase, dans l’onglet « Groupes » du tableur (seul le néo-impressionnisme y est), puis remplir la colonne « Groupes » des artistes concernés. Pistes tirées des fiches : Die Brücke et Der Blaue Reiter (expressionnisme), néo-impressionnisme et synthétisme (post-impressionnisme), suprématisme et De Stijl (abstraction), action painting et color field (expressionnisme abstrait).
 - Ajouter les relations entre mouvements (filiation, réaction), avec leur explication, et compléter les explications des 12 relations entre artistes.
 - Ajouter au tableur Ball, Eluard, Manet et Miró, avec leurs œuvres, puis ramener leurs fiches de `fiches/_en-attente/` dans `fiches/artistes` et `fiches/oeuvres`. Retirer au passage la section « Sources » des 4 fiches artistes.
 

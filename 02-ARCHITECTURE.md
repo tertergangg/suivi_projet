@@ -50,40 +50,47 @@ Les fiches de `fiches/_en-attente/` n’apparaissent pas sur le site. Quand leur
 ## Le tableur
 Une ligne compte comme un élément si sa colonne `ID` est remplie. Colonnes lues par `construire.py` :
 - **Mouvements** : ID, Nom, Début, Fin, Lieu, Couleur, Résumé court (1 phrase).
-- **Artistes** : ID, Nom complet, Naissance, Décès, Nationalité, Rôle, Mouvement principal, Autres mouvements, Phrase-clé (1 phrase).
+- **Groupes** (D22) : ID, Nom, Mouvement, Début, Fin, Lieu, Résumé court (1 phrase). Un groupe est rattaché à un seul mouvement et n’a pas de fiche.
+- **Artistes** : ID, Nom complet, Naissance, Décès, Nationalité, Rôle, Mouvement principal, Autres mouvements, Phrase-clé (1 phrase), Groupes.
   - « Autres mouvements » contient des **identifiants de mouvements séparés par des virgules** (`fauvisme, cubisme`).
+  - « Groupes » contient des **identifiants de groupes séparés par des virgules**. Un artiste peut appartenir à plusieurs groupes, même d’un autre mouvement que son mouvement principal.
   - « Nationalité » est attendue au féminin (« française ») : l’étiquette de la vue mouvement affiche « Nationalité française ».
 - **Œuvres** : ID, Titre, Artiste (ID), Année, Mouvement, Date affichée, Type, Musée, Ville, Majeure (Bible), Lien image, Résumé court (1 phrase).
 - **Événements** : ID, Année, Date précise, Titre, Lieu, Mouvement, Description (1-2 phrases).
-- **Influences** : ID, De (ID), Vers (ID), Type, Explication (1-2 phrases).
+- **Influences** : ID, De (ID), Vers (ID), Type, Explication (1-2 phrases). L’onglet réunit toutes les relations (D23). De et Vers acceptent un artiste ou un mouvement. Les types : `influence` (d’un artiste vers un artiste ou un mouvement), `collaboration` et `rivalité` (entre deux artistes), `filiation` et `réaction` (entre deux mouvements).
 
-Les autres colonnes (Fichier fiche, Statut fiche, Nb…, Domaine public ?, Notes / corrections) servent au suivi et ne sont pas lues. L’onglet « Lisez-moi » non plus.
+Les autres colonnes (Fichier fiche, Statut fiche, Nb…, Domaine public ?, De, Vers, Notes / corrections) servent au suivi et ne sont pas lues. L’onglet « Lisez-moi » non plus.
 Le tableur contient des listes déroulantes Excel qu’openpyxl ne sait pas lire : d’où l’avertissement `Data Validation extension is not supported`, sans danger puisque construire.py n’enregistre jamais le fichier.
 
 ## construire.py
-1. Lit les cinq onglets.
+1. Lit les six onglets, et s’arrête avec un message clair si l’un d’eux manque.
 2. Pour chaque mouvement, artiste et œuvre, lit `fiches/<dossier>/<id>.md`, sans l’en-tête YAML, le premier titre `#` et les commentaires `<!-- -->`. Une fiche de moins d’une vingtaine de caractères de vrai texte est considérée comme vide : le site affiche alors « fiche à venir ».
-3. Met en forme les textes affichés, jamais les identifiants : apostrophe typographique (`typo`, pas sur le Markdown des fiches), majuscule initiale de la nationalité et du rôle (`majuscule`), découpage de « Autres mouvements » en liste (`lire_autres`).
+3. Met en forme les textes affichés, jamais les identifiants : apostrophe typographique (`typo`, pas sur le Markdown des fiches), majuscule initiale de la nationalité et du rôle (`majuscule`), découpage de « Autres mouvements » et de « Groupes » en listes (`decouper`, puis `lire_autres` et `lire_groupes_artiste`).
 4. Vérifie la cohérence et affiche des avertissements (`avertir()`) :
-   - mouvement, autre mouvement ou artiste inconnu, avec l’identifiant suggéré quand c’est possible ;
-   - fiche manquante, année manquante, identifiant en double ;
+   - mouvement, autre mouvement, groupe ou artiste inconnu, avec l’identifiant suggéré quand c’est possible ;
+   - groupe dont le mouvement est inconnu ou dont le début suit la fin ;
+   - relation dont un bout n’est ni un artiste ni un mouvement, dont le type manque ou sort de la liste de D23, ou qui relie des genres d’éléments que son type n’accepte pas (`TYPES_RELATIONS`) ;
+   - fiche manquante, année manquante, identifiant en double (tous types confondus, groupes compris) ;
    - fiche sans ligne dans le tableur (`verifier_orphelines()`, qui ne parcourt pas les sous-dossiers) ;
-   - lien `[[id]]` vers un identifiant inconnu, ou mal formé (`verifier_liens()`, même règle que `markdown()` dans `src/lib/fiches.js`) ;
-   - chemin d’image relatif, ou image absente de `public/` (`verifier_image()`).
-5. Écrit `src/data/frise.json`, un objet JSON `{ mouvements, artistes, oeuvres, evenements, influences }`.
+   - lien `[[id]]` vers un identifiant inconnu, ou mal formé (`verifier_liens()`, même règle que `markdown()` dans `src/lib/fiches.js`) ; lien vers un groupe, signalé jusqu’à l’étape 2e parce que la frise ne sait pas l’afficher ;
+   - chemin d’image relatif, ou image absente de `public/` (`verifier_image()`) ;
+   - année d’une œuvre qui sort des années de sa date affichée (`verifier_date()`, avec `annees_ecrites()`, qui comprend « vers 1893 », « 1884-1886 » ou « années 1920 »).
+5. Écrit `src/data/frise.json`, un objet JSON `{ mouvements, groupes, artistes, oeuvres, evenements, influences }`.
 
-`main()` enchaîne ces étapes : une fonction de lecture par onglet, puis `verifier_ensemble()`, `ecrire()` et `afficher_bilan()`.
+`main()` enchaîne ces étapes : une fonction de lecture par onglet (les groupes avant les artistes, qui y renvoient), puis `verifier_ensemble()`, `ecrire()` et `afficher_bilan()`. Le script reste en un seul fichier (D32).
 
 ## Format des données (src/data/frise.json)
 - **mouvement** : id, nom, debut, fin, lieu, couleur, resume, fiche, ficheVide
-- **artiste** : id, nom, naissance, deces, nationalite, role, mouvement, autres, phrase, fiche, ficheVide
+- **groupe** : id, nom, mouvement, debut, fin, lieu, resume
+- **artiste** : id, nom, naissance, deces, nationalite, role, mouvement, autres, groupes, phrase, fiche, ficheVide
   - `autres` est une **liste** : des identifiants de mouvements, ou du texte pour une valeur inconnue.
+  - `groupes` est une **liste** d’identifiants de groupes connus : une valeur inconnue est signalée et écartée.
   - `role` est affiché sous le libellé « Disciplines ».
 - **oeuvre** : id, titre, artiste, annee, mouvement, dateAffichee, type, musee, ville, majeure (booléen), image, resume, fiche, ficheVide
 - **evenement** : id, annee, date, titre, lieu, mouvement, description
-- **influence** : de, vers, type, explication
+- **influence** : de, vers (un artiste ou un mouvement), type, explication
 
-Le champ `fiche` contient le Markdown de la fiche, ou une chaîne vide si elle n’est pas rédigée.
+Le champ `fiche` contient le Markdown de la fiche, ou une chaîne vide si elle n’est pas rédigée. La frise ne lit pas encore `groupes`, et n’affiche que les relations entre deux artistes.
 
 ## index.astro
 La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant l’affichage, l’en-tête, le bandeau de la vue mouvement, la zone qui défile, la barre du bas, la bulle, le panneau et le `<dialog>` de l’image en grand. Un seul script termine la page : `src/scripts/app.js`, sans `is:inline`. Astro le traite comme un module, résout ses imports (`frise.json`, `src/lib/`, marked) et le publie dans `dist/_astro/`.
@@ -93,6 +100,7 @@ La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant
 - **app.js** importe ses données et le contenu des fiches depuis `src/lib/` (D29, D31). C’est un module : il s’exécute en mode strict, et ses fonctions ne sont pas globales. L’objet `REGLAGES`, en tête du fichier, réunit les réglages modifiables : période affichée, année de départ, échelle et largeur des cartes aux zooms « Détail » et « Moyen », hauteur des lignes, marges de la vue mouvement.
 - **Un état, un dessin.** L’objet `etat` dit ce qui est affiché (vue, mouvement, zoom Moyen, case « Œuvres majeures seulement »). `dessiner()` refait tout le HTML de la frise à partir de cet état, et `fenetre()` calcule la période et l’échelle.
 - **Trois vues** : « détail » (la frise complète, un couloir par mouvement, une carte par œuvre, vue par défaut), « ensemble » (toute la période sans défilement, une bande par mouvement), « mouvement » (un mouvement en grand, une ligne par artiste). Le zoom « Moyen » n’est pas une quatrième vue : c’est la vue détail resserrée (`etat.moyen`), dont seule `fenetre()` tient compte.
+- **Cartes d’œuvres** : elles affichent l’année qui les place sur la frise, et non la date affichée (D33).
 - **Navigation** : glisser à la souris, flèches du clavier, barre du bas (trois boutons de zoom, puis des repères : les décennies, ou des années en vue mouvement), sommaire des mouvements, recherche insensible aux accents, bouton « Une œuvre au hasard ».
 - **Panneau** : il affiche une fiche, dont le HTML vient de `src/lib/fiches.js`, ou l’Index. S’y ajoutent la bulle d’aperçu au survol d’une œuvre et l’image en grand (`<dialog>`).
 - **Liens internes** : `[[id]]` ou `[[id|texte]]` devient un lien `#id`. Une fiche ouverte met `#id` dans l’adresse ; une adresse en `#id` ouvre la fiche.
@@ -116,7 +124,7 @@ La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant
 
 # B. Architecture cible : le site complet (phase 2 et suivantes)
 
-Les choix de cette partie sont fixés par D17 à D31. Un prototype de structure, publié sur claude.ai le 6 novembre 2026 et rangé hors du dépôt, en donne une image cliquable ; il est antérieur aux décisions D20 à D22 et montre encore une sous-rubrique « Textes ».
+Les choix de cette partie sont fixés par D17 à D33. Un prototype de structure, publié sur claude.ai le 6 novembre 2026 et rangé hors du dépôt, en donne une image cliquable ; il est antérieur aux décisions D20 à D22 et montre encore une sous-rubrique « Textes ».
 
 ## Principes
 1. **Les sources ne bougent pas.** Le tableur et les fiches restent la source de vérité et se modifient comme aujourd’hui (D5).
@@ -173,16 +181,12 @@ Sur les pages, les cartes sont réservées aux œuvres. Les mouvements et les ar
 
 ## Modèle de données cible
 Ce qui change dans le tableur et dans `frise.json` (étape 2d) :
-- **Onglet « Groupes »** (nouveau) : ID, Nom, Mouvement, Début, Fin, Lieu, Résumé court (1 phrase). Un groupe est rattaché à un seul mouvement.
-- **Onglet Artistes** : nouvelle colonne « Groupes », des identifiants de groupes séparés par des virgules, comme « Autres mouvements ». Elle accepte plusieurs groupes, et un groupe d’un autre mouvement que le mouvement principal (Kandinsky : mouvement principal `abstraction`, groupe Der Blaue Reiter, rattaché à l’expressionnisme).
-- **Onglet « Influences »** : De et Vers acceptent un artiste ou un mouvement. Types autorisés (D23) :
-  - `influence` : d’un artiste vers un artiste ou un mouvement ;
-  - `collaboration`, `rivalité` : entre deux artistes ;
-  - `filiation`, `réaction` : entre deux mouvements.
+- **Onglet « Groupes »** et colonne « Groupes » de l’onglet Artistes : faits (sous-étape 2d.1, voir partie A). Exemple d’un groupe d’un autre mouvement : Kandinsky, mouvement principal `abstraction`, groupe Der Blaue Reiter, rattaché à l’expressionnisme.
+- **Onglet « Influences »** étendu aux mouvements, avec la liste fermée des types de D23 : fait (sous-étape 2d.2, voir partie A).
 - **Onglet « Glossaire »** (nouveau) : ID, Terme, Définition, Voir aussi (identifiants séparés par des virgules). Une fiche y renvoie par `[[id]]` (D24).
 - **Niveau d’une œuvre**, déduit de sa fiche, sans colonne (D21) : fiche vide, l’œuvre est référencée ; présentation sans analyse, elle est documentée ; analyse présente, elle est analysée. Le titre qui marque l’analyse sera fixé avec le nouveau gabarit.
 - **Fiches** : deux nouveaux dossiers, `fiches/parcours/` et `fiches/comparaisons/`. Leur en-tête YAML liste les étapes (identifiants dans l’ordre) ou les deux éléments comparés.
-- **Identifiants** : groupes, termes, parcours et comparaisons partagent l’espace unique des autres éléments (D9). Le contrôle des doublons de construire.py s’étend à eux.
+- **Identifiants** : groupes, termes, parcours et comparaisons partagent l’espace unique des autres éléments (D9). Le contrôle des doublons de construire.py couvre déjà les groupes, et s’étendra aux autres.
 
 Ce qui ne change pas : « Mouvement principal » (la frise a besoin d’un couloir par artiste) et « Autres mouvements » ; la paire Année / Date affichée pour les dates incertaines ; le format des fiches existantes.
 Ce qu’on ne stocke pas : « contemporain » (calculé à partir des dates) ; la période d’un artiste dans un mouvement (déduite des dates de ses œuvres).

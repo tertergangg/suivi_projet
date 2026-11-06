@@ -11,9 +11,11 @@ Le détail des entrées jusqu’au 4 novembre 2026 est dans l’historique Git d
 Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 
 ## À régler pendant la phase 2
-- construire.py fait 271 lignes, et l’étape 2d y ajoute trois onglets et leurs vérifications : envisager alors de séparer la lecture et les vérifications en deux fichiers Python.
+- construire.py fait 358 lignes, et l’étape 2d y ajoute encore le glossaire, le niveau des œuvres, les parcours et les comparaisons. Il reste en un seul fichier (D32) : à reconsidérer s’il devient difficile à lire.
 - `NOMS_COURTS` (src/lib/outils.js) est une donnée rangée dans le code. Si deux artistes d’un même mouvement partagent un nom de famille, les listes de la fiche mouvement les confondront.
 - `lien()` (src/lib/fiches.js) donne toujours `#id`. À l’étape 2e, il devra donner l’adresse de la page, selon le type de l’élément (ARCHITECTURE, partie B, « Liens »).
+- Un lien `[[id]]` vers un groupe est signalé par construire.py (paramètre `ids_pas_encore_affiches` de `verifier_liens()`), car la frise afficherait l’identifiant brut, sans lien utile. À l’étape 2e, quand `lien()` saura viser `/mouvements/<mouvement>/#<groupe>`, retirer cet avertissement provisoire.
+- L’onglet « Influences » et la clé `influences` de frise.json contiennent maintenant toutes les relations (D23) : leur nom est trompeur. Un renommage toucherait le tableur, construire.py et src/lib/fiches.js.
 
 ## Plus tard, sans urgence
 **Frise**
@@ -30,6 +32,7 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - `verifier_image()` ne voit pas une différence de majuscules entre le tableur et le nom du fichier : Windows les confond, Cloudflare non, et l’image serait cassée en ligne. Garder des noms d’images en minuscules.
 - Astro est noté `^7.4.4` dans `package.json`, alors que marked et wrangler sont en version exacte. `package-lock.json` le protège déjà : à fixer en version exacte par cohérence, dans une branche testée.
 - `ONGLETS_INDEX` (titres des onglets de l’Index) est dans src/lib/outils.js parce que `compter()` en a besoin. À séparer si les pages ont un jour d’autres mots à compter.
+- construire.py : `lire_groupes_artiste()` et `lire_autres()` se ressemblent (découpage, avertissement, suggestion d’identifiant), mais traitent différemment une valeur inconnue : la première l’écarte, la seconde la garde en texte.
 
 **À tester**
 - La coupure d’`aria-live` pendant l’Index n’a pas été testée avec un vrai lecteur d’écran. À faire avant l’ouverture au public.
@@ -45,10 +48,18 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - Avertissements Git « LF will be replaced by CRLF » (réglage `core.autocrlf` de Windows) : sans danger. Piste : un fichier `.gitattributes`.
 - Le README et ARCHITECTURE se recoupent (arborescence, déploiement). Principe proposé : le README reste un mode d’emploi, et le détail technique va dans ARCHITECTURE.
 - `npm install` signale que les scripts postinstall d’esbuild et de workerd (arrivés avec wrangler) ne sont pas couverts par `allowScripts` : ils ne sont pas lancés. Sans effet constaté, en local comme sur Cloudflare. À surveiller si une version de npm en fait une erreur.
+- Tableur : les listes déroulantes « De (ID) » et « Vers (ID) » de l’onglet Influences ne proposent que les artistes. Un identifiant de mouvement est accepté après un simple message, car Excel ne sait pas réunir deux onglets dans une même liste.
+- Tableur : le tableau « Avancement » de l’onglet Lisez-moi n’a pas de ligne pour les groupes.
 
 ---
 
 # Entrées
+
+## 6 novembre 2026 · Étape 2d, sous-étapes 1 et 2, et revue des données
+**Fait** : l’étape 2d est découpée en cinq sous-étapes, sur la branche `modele-donnees`, et construire.py reste un seul fichier (D32). Sous-étape 1 : onglet « Groupes » (le néo-impressionnisme, rattaché au post-impressionnisme) et colonne « Groupes » des artistes (Seurat), lus et vérifiés par construire.py, qui s’arrête aussi avec un message clair si un onglet manque. Sous-étape 2 : De et Vers acceptent un mouvement, la liste des types du tableur est celle de D23 (`maître-élève` retiré), et construire.py vérifie le type et les genres d’éléments qu’il relie (`TYPES_RELATIONS`). Revue des données : construire.py signale un lien vers un groupe et une année qui sort de la date affichée, six identifiants d’œuvres coupés sont complétés (fiches renommées avec `git mv`), et l’onglet Groupes reçoit sa colonne « Notes / corrections ». Le tableur a été modifié directement dans son XML, pour garder listes déroulantes et formules. À chaque étape, frise.json n’a changé que par les ajouts prévus et les six identifiants.
+**Écarté** : afficher la date affichée sur les cartes de la frise (D33).
+**Reste à faire** : les sous-étapes 3 (glossaire), 4 (niveau des œuvres et nouveau gabarit) et 5 (parcours et comparaisons), dans une nouvelle conversation, puis le test sur la version de test et la fusion dans `main`.
+**Décisions prises** : D32, D33.
 
 ## 6 novembre 2026 · Étape 2c terminée
 **Fait** : marked passe du CDN à une dépendance npm, dans la même version, fixée en version exacte (18.0.14) : le site ne charge plus rien depuis jsDelivr. Création de `src/lib/` : `donnees.js` (données, accès par identifiant, `couleur`, `mouvementsTries`), `outils.js` (`esc`, `sansAccent`, `nomCourt`, `compter`, `estImage`…) et `fiches.js` (les quatre fonctions `fiche…` et ce qu’elles utilisent). `ficheMouvement()` reçoit un paramètre `avecExplorer` et ne lit plus `etat`. Le reste d’app.js n’est pas découpé (D31). `hauteurAxe()` remplace le calcul fait deux fois, et `markdown()` renvoie maintenant à `verifier_liens()`. Une page de test temporaire, non commitée, a prouvé que `src/lib/` fonctionne au build, dans Node. Testé en local, puis sur la version de test ; fusionné dans `main`.

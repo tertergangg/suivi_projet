@@ -121,3 +121,7 @@ Alternative écartée : garder le CDN, qui ne permettait pas de fabriquer le con
 **D31 · app.js n’est découpé qu’en ce qui sert aux pages** · Décidé (6 novembre 2026)
 Seuls le contenu des fiches et ses outils sont sortis d’app.js, dans `src/lib/` (`donnees.js`, `outils.js`, `fiches.js`). La navigation, les vues, la recherche, l’Index et le thème restent dans `src/scripts/app.js`, rangés par sections. Rien dans la suite n’a besoin de ce découpage, et c’en était la partie la plus risquée : ordre d’exécution des modules, imports oubliés, imports circulaires. Un fichier déjà connu est plus simple à retoucher qu’une dizaine de modules qui s’importent les uns les autres. Le découpage pourra être repris plus tard, par exemple au lot 4, si app.js devient difficile à lire.
 Alternative écartée : découper app.js en huit modules (état, vues, frise, panneau, survol, en-tête, recherche, thème).
+
+**D32 · construire.py reste un seul fichier** · Décidé (6 novembre 2026)
+Les nouvelles lectures et vérifications de l’étape 2d s’ajoutent à construire.py, qui garde une fonction de lecture par onglet. Ces fonctions font déjà leurs propres vérifications : les séparer obligerait à faire circuler `avertir()` et les identifiants entre deux fichiers. C’est le même raisonnement que D31. À reconsidérer si le fichier devient difficile à lire.
+Alternative écartée : séparer la lecture et les vérifications en deux fichiers Python.

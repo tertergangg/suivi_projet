@@ -34,6 +34,7 @@ Ces règles décrivent le style déjà en place dans le code. Le nouveau code do
 - En minuscules, sans accents, avec des tirets : `van-gogh`, `les-demoiselles-d-avignon`.
 - L’identifiant est le même dans le tableur (colonne ID), dans le nom de la fiche (`<id>.md`) et dans l’adresse de la page.
 - Il est unique sur tout le site, tous types confondus : mouvements, artistes, œuvres, événements, groupes, termes du glossaire, parcours et comparaisons.
+- Une œuvre reprend son titre complet, jamais coupé (`un-dimanche-apres-midi-a-l-ile-de-la-grande-jatte`) ; « œ » s’écrit `oe` (`l-oeil-cacodylate`). Un artiste et un événement ont un identifiant court (`monet`, `cabaret-voltaire`).
 - On ne le change plus une fois le site public (D9).
 
 ## Fiches
@@ -47,6 +48,8 @@ Ces règles décrivent le style déjà en place dans le code. Le nouveau code do
 ## Tableur
 - Les relations (onglet « Influences ») n’utilisent que les types de D23 : `influence`, `collaboration`, `rivalité`, `filiation`, `réaction`. Une relation sans explication est permise, mais on n’invente jamais d’explication.
 - On ne saisit pas ce qui se calcule : les contemporains, la période d’un artiste dans un mouvement, les listes d’œuvres ou d’artistes.
+- Une liste dans une cellule (« Autres mouvements », « Groupes ») : des identifiants séparés par des virgules.
+- Le tableur ne s’enregistre jamais avec openpyxl, qui supprimerait ses listes déroulantes. Une modification faite par un script passe directement par le XML du fichier, et on compare ensuite toutes les cellules avec l’original.
 
 ## Typographie des textes affichés
 - Apostrophe typographique (’), guillemets français (« ») et tiret demi-cadratin entre deux dates (1874–1960).
