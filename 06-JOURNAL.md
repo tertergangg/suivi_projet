@@ -11,7 +11,7 @@ Le détail des entrées jusqu’au 4 novembre 2026 est dans l’historique Git d
 Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 
 ## À régler pendant la phase 2
-- `main()` de construire.py fait près de 100 lignes : le découper quand il écrira `src/data/frise.json` (étape 2b).
+- construire.py fait 271 lignes, et l’étape 2d y ajoute trois onglets et leurs vérifications : envisager alors de séparer la lecture et les vérifications en deux fichiers Python.
 - Des outils d’app.js serviront aussi aux pages (étape 2c) :
   - `compter()`, rangé dans la section de l’Index, sert déjà ailleurs ;
   - `NOMS_COURTS` est une donnée rangée dans le code. Si deux artistes d’un même mouvement partagent un nom de famille, les listes de la fiche mouvement les confondront.
@@ -50,6 +50,11 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 ---
 
 # Entrées
+
+## 6 novembre 2026 · Étape 2b terminée
+**Fait** : `main()` de construire.py est découpé en une fonction par onglet (`lire_mouvements()`…), puis `verifier_ensemble()`, `ecrire()` et `afficher_bilan()`. data.js est resté identique avant et après le découpage, ce qui a aussi été vérifié sur un faux tableur qui déclenche les 18 avertissements. construire.py écrit maintenant `src/data/frise.json`, et `public/data.js` est supprimé. app.js est déplacé dans `src/scripts/`, sous le même nom, et devient un module traité par Astro qui importe le JSON (D29). `marked` reste chargé depuis le CDN, avant lui. Une analyse ESLint, hors du dépôt, n’a trouvé aucune variable non déclarée qui casserait le mode strict des modules. Testé en local, puis sur la version de test ; fusionné dans `main`.
+**Reste à faire** : l’étape 2c (découpage d’app.js), dans une nouvelle conversation.
+**Décisions prises** : D29.
 
 ## 6 novembre 2026 · Structure du site
 **Fait** : tri des « Idées à trier » de Lovable, puis deux nouvelles séries de maquettes Lovable (en-tête, étiquettes, zoom ; plans de site et gabarits). Un prototype de structure cliquable, fait avec les vraies données, publié sur claude.ai et gardé hors du dépôt. Une analyse de ce prototype par une autre IA, confrontée point par point. La structure est fixée : la frise reste l’accueil, cinq rubriques, des adresses par type, un texte par page, trois niveaux d’œuvre, des groupes pour les sous-courants (le néo-impressionnisme en devient un, sans couloir dans la frise), des relations typées, Comprendre réduite à trois sous-rubriques et ouverte après le lancement. Les six documents sont mis à jour.

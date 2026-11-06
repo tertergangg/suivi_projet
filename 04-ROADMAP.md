@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : phase 2, étape 2b.** La structure du site est fixée (D17 à D28). Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
+**Étape en cours : phase 2, étape 2c.** La structure du site est fixée (D17 à D28). Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
 
 ---
 
@@ -16,7 +16,7 @@ Le détail est dans le JOURNAL et dans l’historique Git.
 ## Phase 2 · Une page par fiche
 Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la frise restant à `/` (D17) et identique à aujourd’hui. Une étape = une branche, testée sur l’aperçu Cloudflare avant d’aller dans `main`.
 - **2a · Vérifications.** Terminé le 5 novembre 2026. construire.py signale un lien `[[id]]` vers un identifiant inconnu ou mal formé, un chemin d’image qui ne commence ni par `/` ni par `http`, et une image absente de `public/`.
-- **2b · Les données et la frise passent dans Astro.** construire.py écrit `src/data/frise.json` au lieu de `public/data.js` (D7, D8), et `main()` est découpé. Le script de la frise devient un module traité par Astro qui lit ces données (D15), sans aucun autre changement. C’est l’étape la plus risquée de la phase : elle se fait seule.
+- **2b · Les données et la frise passent dans Astro.** Terminé le 6 novembre 2026. construire.py écrit `src/data/frise.json` et son `main()` est découpé. app.js est déplacé dans `src/scripts/` et devient un module traité par Astro, qui importe le JSON (D29).
 - **2c · Découpage d’app.js.** Les fonctions qui fabriquent les fiches et les outils qu’elles utilisent vont dans `src/lib/`, le reste dans `src/scripts/` (navigation, vues, recherche, Index…). Sans renommage. À trancher à cette étape : `marked` reste-t-il chargé depuis le CDN ?
 - **2d · Le modèle de données.** Dans le tableur et construire.py, sans rien changer à l’affichage :
   - un onglet « Groupes » (D22) et une colonne « Groupes » dans l’onglet Artistes ;

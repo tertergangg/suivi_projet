@@ -9,17 +9,17 @@ Ce document décrit le site tel qu’il est (partie A) et tel qu’il doit deven
 ## Flux des données
 ```
 donnees/frise_art_moderne_base.xlsx ─┐
-                                     ├─> python construire.py ─> public/data.js ─┐
-fiches/<type>/<id>.md ───────────────┘                                           ├─> npm run build ─> dist/
-src/pages/index.astro + public/ (app.js, style.css, images) ─────────────────────┘
+                                     ├─> python construire.py ─> src/data/frise.json ─┐
+fiches/<type>/<id>.md ───────────────┘                                                ├─> npm run build ─> dist/
+src/pages/index.astro + src/scripts/app.js + public/ (style.css, images) ─────────────┘
 ```
-Le site lui-même ne lit ni le tableur ni les fiches : il ne lit que `data.js`, produit par `construire.py`. Astro transforme `index.astro` en `dist/index.html` et copie le dossier `public/` tel quel dans `dist/`.
+Le site lui-même ne lit ni le tableur ni les fiches : il ne lit que `frise.json`, produit par `construire.py`. Astro transforme `index.astro` en `dist/index.html`. Il intègre `frise.json` au script de la frise et publie ce script dans `dist/_astro/`, sous un nom qui change à chaque modification. Enfin, il copie le dossier `public/` tel quel dans `dist/`.
 
 ## Arborescence
 C’est l’état de la branche `main`, celle qui est en ligne.
 ```
 README.md                   mode d’emploi (installation, travail sur le contenu, publication)
-construire.py               tableur + fiches -> public/data.js (Python, librairie openpyxl)
+construire.py               tableur + fiches -> src/data/frise.json (Python, librairie openpyxl)
 package.json                projet Astro : dépendance astro, wrangler en devDependencies (version exacte, D16), scripts dev, build, preview
 package-lock.json           FABRIQUÉ par npm : versions exactes de toutes les dépendances, ne jamais le modifier à la main
 astro.config.mjs            configuration d’Astro (par défaut, vide)
@@ -34,10 +34,10 @@ fiches/
   mouvements/  artistes/  oeuvres/     une fiche = un fichier <id>.md
 src/
   pages/index.astro         structure de la page de la frise
+  scripts/app.js            fonctionnement de la frise (≈ 840 lignes), module traité par Astro
+  data/frise.json           GÉNÉRÉ par construire.py, commité (D8) : ne jamais le modifier à la main
 public/                     copié tel quel dans dist/
   style.css                 apparence (≈ 480 lignes)
-  app.js                    fonctionnement de la frise (≈ 840 lignes)
-  data.js                   GÉNÉRÉ par construire.py : ne jamais le modifier à la main
   images/
   favicon.svg  favicon.ico  logos par défaut d’Astro (à remplacer en phase 3)
 ```
@@ -66,9 +66,11 @@ Le tableur contient des listes déroulantes Excel qu’openpyxl ne sait pas lire
    - fiche sans ligne dans le tableur (`verifier_orphelines()`, qui ne parcourt pas les sous-dossiers) ;
    - lien `[[id]]` vers un identifiant inconnu, ou mal formé (`verifier_liens()`, même règle que `markdown()` dans app.js) ;
    - chemin d’image relatif, ou image absente de `public/` (`verifier_image()`).
-5. Écrit `public/data.js` sous la forme `window.FRISE = { mouvements, artistes, oeuvres, evenements, influences }`.
+5. Écrit `src/data/frise.json`, un objet JSON `{ mouvements, artistes, oeuvres, evenements, influences }`.
 
-## Format des données (window.FRISE)
+`main()` enchaîne ces étapes : une fonction de lecture par onglet, puis `verifier_ensemble()`, `ecrire()` et `afficher_bilan()`.
+
+## Format des données (src/data/frise.json)
 - **mouvement** : id, nom, debut, fin, lieu, couleur, resume, fiche, ficheVide
 - **artiste** : id, nom, naissance, deces, nationalite, role, mouvement, autres, phrase, fiche, ficheVide
   - `autres` est une **liste** : des identifiants de mouvements, ou du texte pour une valeur inconnue.
@@ -80,10 +82,10 @@ Le tableur contient des listes déroulantes Excel qu’openpyxl ne sait pas lire
 Le champ `fiche` contient le Markdown de la fiche, ou une chaîne vide si elle n’est pas rédigée.
 
 ## index.astro
-La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant l’affichage, l’en-tête, le bandeau de la vue mouvement, la zone qui défile, la barre du bas, la bulle, le panneau et le `<dialog>` de l’image en grand. Les trois scripts (marked, data.js, app.js) sont chargés en `is:inline` : Astro les publie sans les transformer, et ils ne peuvent rien importer.
+La structure fixe de la page : le script du `<head>` qui pose `data-theme` avant l’affichage, l’en-tête, le bandeau de la vue mouvement, la zone qui défile, la barre du bas, la bulle, le panneau et le `<dialog>` de l’image en grand. Deux scripts terminent la page. `marked` est chargé depuis le CDN en `is:inline` : Astro le publie sans le transformer. Puis vient `src/scripts/app.js`, sans `is:inline` : Astro le traite comme un module, résout son import de `frise.json` et le publie dans `dist/_astro/`. Un module s’exécute à la fin de la lecture de la page, donc après `marked`.
 
-## app.js
-- Lit `window.FRISE`. L’objet `REGLAGES`, en tête du fichier, réunit les réglages modifiables : période affichée, année de départ, échelle et largeur des cartes aux zooms « Détail » et « Moyen », hauteur des lignes, marges de la vue mouvement.
+## app.js (src/scripts/)
+- Importe ses données (`import D from "../data/frise.json"`, D29). C’est un module : il s’exécute en mode strict, et ses fonctions ne sont pas globales. L’objet `REGLAGES`, en tête du fichier, réunit les réglages modifiables : période affichée, année de départ, échelle et largeur des cartes aux zooms « Détail » et « Moyen », hauteur des lignes, marges de la vue mouvement.
 - **Un état, un dessin.** L’objet `etat` dit ce qui est affiché (vue, mouvement, zoom Moyen, case « Œuvres majeures seulement »). `dessiner()` refait tout le HTML de la frise à partir de cet état, et `fenetre()` calcule la période et l’échelle.
 - **Trois vues** : « détail » (la frise complète, un couloir par mouvement, une carte par œuvre, vue par défaut), « ensemble » (toute la période sans défilement, une bande par mouvement), « mouvement » (un mouvement en grand, une ligne par artiste). Le zoom « Moyen » n’est pas une quatrième vue : c’est la vue détail resserrée (`etat.moyen`), dont seule `fenetre()` tient compte.
 - **Navigation** : glisser à la souris, flèches du clavier, barre du bas (trois boutons de zoom, puis des repères : les décennies, ou des années en vue mouvement), sommaire des mouvements, recherche insensible aux accents, bouton « Une œuvre au hasard ».
@@ -209,13 +211,13 @@ src/
 - **Rubriques et adresses** : D18. **Comprendre** : D20, ouverte après le lancement (D26).
 - **Pages** : seulement pour les fiches rédigées (D13) ; pour une œuvre, dès qu’elle est documentée (D21).
 - **Script de la frise** : un module traité par Astro, qui partage `src/lib/` avec les pages (D15).
+- **Données de la frise** : le module importe `src/data/frise.json` (D29).
 - **Liens** : une seule fonction de `src/lib/` transforme `[[id]]`. Dans le panneau de la frise, elle donne `#id`. Sur les pages, elle donne `/<type>/<id>/` si la fiche est rédigée, `/mouvements/<mouvement>/#<id>` pour un groupe, `/comprendre/glossaire/#<id>` pour un terme, `/#id` sinon.
 - **Images** : chemins absolus (`/images/…`), vérifiés par construire.py, pour fonctionner à toutes les profondeurs d’adresse.
 - **Découpage d’app.js** : sans renommage. `majDecennies()`, `.decennie` et `#decennies` gardent leur nom.
 - **Recherche** : un seul outil, au lot 4 (D28).
 
 ## Points à trancher, à l’étape indiquée (voir ROADMAP)
-- **2b · Données** : comment le module de la frise reçoit `frise.json`, par un import du JSON ou par une injection dans la page. Vérifier le fonctionnement actuel dans la documentation d’Astro (guide « Scripts and event handling »).
 - **2c · Markdown** : `marked` reste-t-il chargé depuis le CDN, ou devient-il une dépendance npm, utilisée au build pour les pages et dans la frise ? La seconde option retire le CDN sans changer de librairie.
 - **2d · Analyse d’une œuvre** : le titre de section qui marque le niveau « analysée ».
 - **2e · Vue mouvement** : la forme de son adresse (D27), sachant que `/#id` ouvre aujourd’hui la fiche dans la vue détail.

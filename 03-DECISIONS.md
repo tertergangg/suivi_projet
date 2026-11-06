@@ -109,3 +109,7 @@ Depuis une page mouvement, le lien ouvre la vue mouvement de la frise. Depuis un
 **D28 · Un seul outil « Rechercher »** · Décidé (6 novembre 2026)
 La recherche de l’en-tête et l’Index sont réunis en un seul tiroir : un champ, puis les onglets Mouvements, Artistes et Œuvres. Le menu mène aux rubriques, « Rechercher » trouve un élément. L’outil est présent sur tout le site. Comme il touche l’en-tête de la frise, il se fait au lot 4, avec l’ajout du menu du site dans cet en-tête.
 Alternative écartée : garder trois façons de chercher la même chose (le menu, l’Index et la recherche).
+
+**D29 · La frise reçoit ses données par un import du JSON** · Décidé (6 novembre 2026)
+`src/scripts/app.js` commence par `import D from "../data/frise.json";`. Au build, Vite intègre les données au script publié dans `dist/_astro/`, sous un nom qui change à chaque modification : un navigateur ne peut plus garder en cache d’anciennes données. Les pages, elles, liront le même fichier au build, dans leur en-tête Astro.
+Alternatives écartées : injecter les données dans la page (`<script type="application/json">`, puis `JSON.parse`), qui ajoute des pièces et oblige à échapper un éventuel `</script>` dans les fiches ; `define:vars`, qui rend le script `is:inline` et lui interdit tout import (contraire à D15).
