@@ -11,8 +11,7 @@ Le détail des entrées jusqu’au 4 novembre 2026 est dans l’historique Git d
 Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 
 ## À régler pendant la phase 2
-- Un lien `[[id]]` vers un groupe, un terme, un parcours ou une comparaison est signalé par construire.py (paramètre `ids_pas_encore_affiches` de `verifier_liens()`), car la frise afficherait l’identifiant brut. Sur les pages, `adresse()` sait déjà viser `/mouvements/<mouvement>/#<groupe>`, mais le panneau de la frise donne encore `#<groupe>`. À la sous-étape 4 de l’étape 2e, retirer les groupes de cet avertissement ; les termes, parcours et comparaisons, en phase 4.
-- `src/lib/fiches.js` réunit maintenant la fabrique du panneau et des fonctions propres aux pages (`aUnePage`, `adresse`, `textePage`). À reconsidérer à l’étape 2f, quand la page œuvre ajoutera les siennes.
+- `src/lib/fiches.js` réunit la fabrique du panneau et des fonctions propres aux pages (`aUnePage`, `adresse`, `textePage`) ; la sous-étape 4 de l’étape 2e y a ajouté `lirePage()` et `destinationPanneau()`. À reconsidérer à l’étape 2f, quand la page œuvre ajoutera les siennes.
 - Le sens d’une relation « filiation » ou « réaction » n’est pas fixé : que veut dire De → Vers ? La page mouvement affiche donc le type de la relation sans son sens. À décider avant de saisir les premières filiations.
 - `NOMS_COURTS` (src/lib/outils.js) est une donnée rangée dans le code. Si deux artistes d’un même mouvement partagent un nom de famille, les listes de la fiche mouvement les confondront.
 - L’onglet « Influences » et la clé `influences` de frise.json contiennent maintenant toutes les relations (D23) : leur nom est trompeur. Un renommage toucherait le tableur, construire.py et src/lib/fiches.js.
@@ -26,6 +25,7 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - Depuis la vue d’ensemble, un clic sur une décennie ramène au dernier zoom choisi, pas forcément à « Détail ».
 - L’Index ne garde pas sa position de défilement au retour, et n’a pas d’adresse `#index`.
 - En vue mouvement, des disciplines longues passent sur deux lignes et agrandissent la ligne de l’artiste.
+- Une adresse `#id` qui reprend une propriété que tout objet JavaScript hérite (`#constructor`, `#toString`) fait planter `ouvrir()` : `OEU[id]` y trouve une fonction. Le démarrage vérifie `?mouvement=` avec `Object.hasOwn`, mais pas le `#id`. Correction d’une ligne, jugée inutile pour l’instant.
 - Thème : la clé `theme` et les valeurs `light`/`dark` sont écrites à trois endroits (le script du `<head>` d’index.astro, celui de Base.astro, et app.js). Après un clic, la bulle du bouton garde l’ancien libellé jusqu’au survol suivant.
 - En-tête : la hauteur du bouton de thème (`2.25rem`) et le `margin-top` de la case « Œuvres majeures seulement » (`0.3rem`) sont calés à la main sur les boutons des mouvements.
 - style.css : `--trait` n’est utilisée nulle part.
@@ -35,13 +35,15 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 
 **Pages**
 - Le `<head>` est écrit deux fois, dans index.astro et dans src/layouts/Base.astro, jusqu’au lot 4 : un changement des polices ou du script du thème se fait dans les deux.
+- Le libellé « Lire la page ↗ » est écrit à trois endroits : `lirePage()` (src/lib/fiches.js), Ligne.astro et Carte.astro.
 - Le tri des œuvres par année est écrit à trois endroits, et pas de la même façon : `listeOeuvres()` (fiches.js) met une œuvre sans année en tête, les pages la mettent en fin de liste.
 - `textePage()` suppose que marked écrit chaque titre `##` en `<h2>` sans attribut, dans l’ordre du Markdown. Une ligne `## ` dans un bloc de code décalerait les ids du sommaire.
 - Répertoire des artistes : quand le filtre cache le premier mouvement, le suivant garde sa marge du haut.
 - Le chapeau du répertoire des mouvements (« Du premier Salon impressionniste… ») est écrit dans le code : il ne suit pas un changement du tableur.
 
 **Fiches et construire.py**
-- construire.py fait 488 lignes ; l’étape 2e n’y a rien ajouté. Il reste en un seul fichier (D32), à reconsidérer s’il grossit encore.
+- Un lien `[[id]]` vers un terme, un parcours ou une comparaison est signalé par construire.py (paramètre `ids_pas_encore_affiches` de `verifier_liens()`), car la frise afficherait l’identifiant brut. À retirer de cet avertissement en phase 4, quand ces éléments auront leur page.
+- construire.py fait environ 490 lignes ; l’étape 2e n’y a changé que l’avertissement des groupes. Il reste en un seul fichier (D32), à reconsidérer s’il grossit encore.
 - construire.py : `lire_groupes_artiste()` et `lire_autres()` se ressemblent (découpage, avertissement, suggestion d’identifiant), mais traitent différemment une valeur inconnue : la première l’écarte, la seconde la garde en texte.
 - Une rubrique laissée vide dans une fiche rédigée affiche son titre seul (seule l’analyse vide est retirée, D34). Piste : retirer toute rubrique vide, après avoir vérifié l’effet sur les fiches mouvements et artistes déjà rédigées.
 - « Voir aussi » garde dans frise.json un identifiant inconnu (signalé), alors qu’un groupe inconnu est écarté.
@@ -51,6 +53,7 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 **À tester**
 - La coupure d’`aria-live` pendant l’Index n’a pas été testée avec un vrai lecteur d’écran. À faire avant l’ouverture au public.
 - La flèche ↗ s’affiche bien dans Chrome, avec Archivo. Reste à vérifier sur Safari et Firefox.
+- Le lien vers un groupe dont le mouvement n’a pas de page (il ouvre alors la fiche du mouvement dans le panneau) n’a pas pu être testé : les 9 mouvements sont rédigés.
 
 **Contenu**
 - « Nationalité … » suppose que la colonne « Nationalité » est au féminin. Rien ne signale une forme masculine.
@@ -68,6 +71,11 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 ---
 
 # Entrées
+
+## 7 novembre 2026 · Étape 2e terminée (sous-étape 4 : ponts)
+**Fait** : sous-étape 4, en trois commits sur la branche `pages`. Liens de groupe : dans le panneau, `destinationPanneau()` mène `[[groupe]]` à la section du groupe sur la page de son mouvement (ou, si ce mouvement n’a pas de page, à sa fiche dans le panneau) ; le lien affiche le nom du groupe et non son identifiant, sur les pages comme dans le panneau ; construire.py cesse de signaler ces liens. « Lire la page » : `lirePage()` ajoute un lien bordé sous le sous-titre des fiches qui ont une page (mouvements et artistes, les œuvres suivront à l’étape 2f), aligné sur « Explorer… » par le bloc flex `.actions-fiche`. Vue mouvement : son adresse `/?mouvement=<id>` (D38) est lue au démarrage et tenue à jour par `changerVue()` (D43) ; « Voir dans la frise » d’une page mouvement y mène. Testé en local et sur la version de test ; branche `pages` fusionnée dans `main`.
+**Reste à faire** : l’étape 2f (catalogue et pages œuvres), dans une nouvelle conversation, en commençant par trancher D10.
+**Décisions prises** : D43 ; D38 et D40 précisées.
 
 ## 7 novembre 2026 · Étape 2e, sous-étapes 1 à 3 : pages mouvements et artistes
 **Fait** : l’étape 2e est découpée en quatre sous-étapes, sur la branche `pages`. Sous-étape 1 : `aUnePage()` et `adresse()` (src/lib/fiches.js) décident de l’adresse de chaque élément ; `lien()` et `markdown()` reçoivent `surPage` ; `GRP` rejoint donnees.js. Le panneau est inchangé, et une page de test non commitée a vérifié les adresses. Sous-étape 2 : `Base.astro` (head, menu Frise / Mouvements / Artistes, fil d’Ariane), `public/pages.css`, quatre composants dans `src/components/` (Ligne, Carte, EnteteFiche, Lecture), le répertoire `/mouvements/` en cartes et une page par mouvement : repère chronologique en bande sous l’en-tête, sommaire fait de vrais liens (`textePage()`), groupes avec leur ancre, œuvres majeures en cartes avec l’étoile, autres œuvres en liste. Sous-étape 3 : le répertoire `/artistes/`, rangé par mouvement, avec un filtre par nom (premier script des pages), et une page par artiste. Le design part du prototype de structure, retouché en cours de route. Testé en local et sur la version de test, adresses avec et sans barre finale comprises. Branche non fusionnée.

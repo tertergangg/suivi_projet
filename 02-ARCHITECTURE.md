@@ -4,7 +4,7 @@ Ce document décrit comment le site fonctionne (partie A) et ce qu’il doit dev
 
 ---
 
-# A. État actuel (novembre 2026, étape 2e en cours sur la branche `pages`)
+# A. État actuel (novembre 2026, étape 2e terminée)
 
 ## Flux des données
 ```
@@ -15,7 +15,7 @@ src/pages/ + src/layouts/ + src/components/ + src/scripts/app.js + src/lib/ + pu
 ```
 Le site ne lit ni le tableur ni les fiches, seulement `frise.json`. Au build, Astro transforme chaque fichier de `src/pages/` en une ou plusieurs pages de `dist/` : `index.astro` donne `dist/index.html`, et `mouvements/[id].astro` une page par mouvement rédigé. Il intègre au script de la frise `frise.json`, `src/lib/` et marked, et publie ce script dans `dist/_astro/`, sous un nom qui change à chaque modification. Les pages, elles, sont fabriquées entièrement au build : leur HTML contient déjà tout leur texte. Il copie `public/` tel quel.
 
-## Arborescence (branche `pages`)
+## Arborescence
 ```
 README.md                mode d’emploi
 construire.py            tableur + fiches -> src/data/frise.json (Python, openpyxl), ≈ 490 lignes
@@ -38,13 +38,13 @@ src/
     artistes/            index.astro (répertoire et son filtre), [id].astro (une page par artiste rédigé)
   layouts/Base.astro     gabarit des pages : <head>, en-tête et menu du site, fil d’Ariane
   components/            morceaux communs aux pages : Ligne, Carte, EnteteFiche, Lecture
-  scripts/app.js         fonctionnement de la frise, ≈ 740 lignes
+  scripts/app.js         fonctionnement de la frise, ≈ 755 lignes
   lib/                   partagé par la frise et les pages (D31)
     donnees.js           importe frise.json ; MOUV, ART, OEU, EVT, GRP, couleur, mouvementsTries
     outils.js            esc, sansAccent, nomCourt, compter, estImage…
-    fiches.js            fiches du panneau (ficheOeuvre…), et pour les pages : aUnePage, adresse, lien, markdown, textePage
+    fiches.js            fiches du panneau (ficheOeuvre…, lirePage), et pour les pages : aUnePage, adresse, lien, markdown, textePage
   data/frise.json        FABRIQUÉ par construire.py, commité (D8)
-public/                  copié tel quel : style.css (≈ 480 lignes), pages.css (≈ 200 lignes), images/, favicons d’Astro (à remplacer en phase 3)
+public/                  copié tel quel : style.css (≈ 490 lignes), pages.css (≈ 200 lignes), images/, favicons d’Astro (à remplacer en phase 3)
 ```
 
 ## Le tableur
@@ -75,7 +75,7 @@ Il signale (`avertir()`) :
 - une fiche manquante, ou une fiche sans ligne dans le tableur (`verifier_orphelines()`) ;
 - une donnée manquante ou incohérente : année d’une œuvre, type de relation, terme ou définition, début d’un groupe après sa fin, année hors de la date affichée (`verifier_date()`) ;
 - une relation dont le type ne relie pas ces genres d’éléments (`TYPES_RELATIONS`) ;
-- un lien `[[id]]` inconnu ou mal formé, et un lien vers ce que la frise ne sait pas encore afficher (groupe, terme, parcours, comparaison) ;
+- un lien `[[id]]` inconnu ou mal formé, et un lien vers ce que la frise ne sait pas encore afficher (terme, parcours, comparaison) ;
 - un chemin d’image relatif, ou une image absente de `public/` ;
 - une analyse sans présentation, ou un titre `## Analyse` en double ;
 - dans un parcours ou une comparaison : un id ou un type d’en-tête faux, un titre manquant, un nombre ou un genre d’éléments incorrect.
@@ -92,7 +92,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - **parcours** : id, titre, etapes, fiche, ficheVide
 - **comparaison** : id, titre, elements, fiche, ficheVide
 
-`fiche` contient le Markdown, ou une chaîne vide si la fiche est vide. Les listes (`autres`, `groupes`, `voirAussi`, `etapes`, `elements`) contiennent des identifiants. Une valeur inconnue est signalée ; `autres` et `voirAussi` la gardent, `groupes` l’écarte. La frise n’utilise ni `groupes`, ni `glossaire`, ni `parcours`, ni `comparaisons`, ni `niveau`, et n’affiche que les relations entre deux artistes. Les pages utilisent `groupes` et toutes les relations ; `glossaire`, `parcours`, `comparaisons` et `niveau` attendent les étapes suivantes.
+`fiche` contient le Markdown, ou une chaîne vide si la fiche est vide. Les listes (`autres`, `groupes`, `voirAussi`, `etapes`, `elements`) contiennent des identifiants. Une valeur inconnue est signalée ; `autres` et `voirAussi` la gardent, `groupes` l’écarte. La frise ne lit les groupes que pour les liens `[[groupe]]` ; elle n’utilise ni la clé `groupes` des artistes, ni `glossaire`, ni `parcours`, ni `comparaisons`, ni `niveau`, et n’affiche que les relations entre deux artistes. Les pages utilisent `groupes` et toutes les relations ; `glossaire`, `parcours`, `comparaisons` et `niveau` attendent les étapes suivantes.
 
 ## La frise
 - **index.astro** : la structure fixe de la page (script du thème dans le `<head>`, en-tête, bandeau, zone qui défile, barre du bas, bulle, panneau, `<dialog>` de l’image) et un seul script, `src/scripts/app.js`, qu’Astro traite comme un module.
@@ -103,11 +103,12 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - **Vues** :
   - « détail », par défaut : un couloir par mouvement, une carte par œuvre, placée à son année et non à sa date affichée (D33) ;
   - « ensemble » : toute la période, sans défilement ;
-  - « mouvement » : une ligne par artiste.
+  - « mouvement » : une ligne par artiste, à l’adresse `/?mouvement=<id>` (D38).
 
   Le zoom « Moyen » est la vue détail resserrée.
+- **Adresse** : elle suit l’affichage, par `history.replaceState`, sans ajouter d’étape à l’historique (D43). `changerVue()` tient à jour `?mouvement=<id>`, et `ouvrir()` le `#id` de la fiche ouverte ; les deux se combinent (`/?mouvement=fauvisme#matisse`). Au démarrage, la vue est affichée d’abord, la fiche ensuite ; un `?mouvement=` inconnu est retiré de l’adresse.
 - **Navigation** : glisser, flèches du clavier, barre du bas (zooms et repères), sommaire des mouvements, recherche insensible aux accents, « Une œuvre au hasard ».
-- **Panneau** : il affiche une fiche ou l’Index. Une fiche ouverte met `#id` dans l’adresse, et une adresse en `#id` ouvre la fiche. Les liens `[[id]]` deviennent des liens `#id`.
+- **Panneau** : il affiche une fiche ou l’Index. Les liens `[[id]]` deviennent des liens `#id`, qui ouvrent la fiche sur place ; un lien vers un groupe mène à la page de son mouvement (`destinationPanneau()`). Une fiche qui a sa page affiche « Lire la page » (D19), un vrai lien que le panneau n’intercepte pas.
 - **Thème** : `data-theme` sur `<html>`, mémorisé dans `localStorage` (clé `theme`).
 - **Accessibilité**, à préserver : ARIA, focus visible, clavier, `prefers-reduced-motion`, `aria-live` du panneau coupé pendant l’Index.
 
@@ -123,7 +124,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - **Page mouvement** : l’en-tête avec ses dates et son lieu, le repère, puis le texte, les groupes (une section et une ancre chacun), les artistes, les œuvres majeures en cartes, les autres œuvres en liste, les moments clés, les filiations et réactions.
 - **Page artiste** : l’en-tête sans chapeau (D41), les rubriques (Nationalité, Disciplines, Mouvement, Aussi, Groupes), le texte, les œuvres en cartes, les liens avec d’autres artistes et avec des mouvements.
 - **Scripts** : un seul, le filtre du répertoire des artistes (D42), en amélioration progressive.
-- « Voir dans la frise » mène pour l’instant à `/#id` ; la vue mouvement aura son adresse à la sous-étape 4 (D38).
+- « Voir dans la frise » mène à la vue mouvement (`/?mouvement=<id>`) depuis une page mouvement, et à `/#id` depuis une page artiste (D27).
 
 ## style.css et pages.css
 style.css est rangé par élément de la page, dans l’ordre où on les rencontre ; chaque section a son bloc `@media (max-width: 720px)`. Le bloc `prefers-reduced-motion` est en toute fin. Les couleurs et polices sont des variables sur `:root`, et le mode sombre est dans `:root[data-theme="dark"]`. Police Archivo (Google Fonts). La couleur des mouvements vient du tableur.
@@ -152,7 +153,7 @@ pages.css, la feuille des pages (D39), est chargée après style.css et rangée 
 
 ## Plan du site
 ```
-/                                 la frise
+/                                 la frise ; /?mouvement=<id> pour la vue mouvement (D38)
 /mouvements/  /mouvements/<id>/   répertoire, puis une page par mouvement ; ses groupes en sections (#<id-du-groupe>)
 /artistes/    /artistes/<id>/     répertoire (par mouvement principal), puis une page par artiste
 /oeuvres/     /oeuvres/<id>/      catalogue filtrable, puis une page par œuvre documentée
@@ -162,7 +163,7 @@ pages.css, la feuille des pages (D39), est chargée après style.css et rangée 
 ```
 Le menu : Frise, Mouvements, Artistes, Œuvres, Comprendre (dès la phase 4), puis « Rechercher » et le thème (D28). Les adresses sont rangées par type, jamais imbriquées (D18). Les événements n’ont pas de page.
 
-**Liens** : une seule fonction de `src/lib/` transforme `[[id]]`. Dans le panneau de la frise, elle donne `#id`. Sur les pages, elle donnera :
+**Liens** : une seule fonction de `src/lib/` transforme `[[id]]`. Dans le panneau de la frise, elle donne `#id`, sauf pour un groupe, qui mène à la page de son mouvement. Sur les pages, elle donnera :
 - `/<type>/<id>/` si l’élément a une page ;
 - `/mouvements/<mouvement>/#<id>` pour un groupe ;
 - `/comprendre/glossaire/#<id>` pour un terme ;

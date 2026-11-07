@@ -144,7 +144,7 @@ Sur les pages, les cartes sont réservées aux œuvres et au répertoire `/mouve
 Alternative écartée : une liste à liseré coloré, comme pour les artistes.
 
 **D38 · La vue mouvement a pour adresse `/?mouvement=<id>`** · Décidé (7 novembre 2026)
-C’est l’adresse que vise « Voir dans la frise » depuis une page mouvement (D27). Le `#` reste réservé à la fiche ouverte, et les deux se combinent : `/?mouvement=fauvisme#matisse`. Elle est mise en place à la sous-étape 4 de l’étape 2e ; d’ici là, le lien vise `/#<id>`.
+C’est l’adresse que vise « Voir dans la frise » depuis une page mouvement (D27). Le `#` reste réservé à la fiche ouverte, et les deux se combinent : `/?mouvement=fauvisme#matisse`. Elle est en place depuis la sous-étape 4 de l’étape 2e (7 novembre 2026), et l’adresse suit la vue (D43).
 Alternative écartée : `/#vue-<id>`, qui donnerait deux sens au même `#` et empêcherait d’y ajouter une fiche.
 
 **D39 · Les pages ont leur feuille de style, `public/pages.css`** · Décidé (7 novembre 2026)
@@ -157,7 +157,7 @@ Alternatives écartées : tout mettre dans style.css, qui mélangerait l’affic
 - `/mouvements/<mouvement>/#<groupe>` pour un groupe, ou `/#<mouvement>` si ce mouvement n’a pas de page ;
 - `/#id` dans tous les autres cas.
 
-Les pages, les composants `Ligne` et `Carte`, et `markdown(md, true)` s’appuient sur elles. Le panneau de la frise garde ses liens `#id`.
+Les pages, les composants `Ligne` et `Carte`, et `markdown(md, true)` s’appuient sur elles. Le panneau de la frise garde ses liens `#id`, sauf pour un groupe : il mène à la page de son mouvement, ou, si ce mouvement n’a pas de page, à sa fiche dans le panneau (`destinationPanneau()`).
 Alternative écartée : un fichier `src/lib/adresses.js`, un module de plus pour deux fonctions.
 
 **D41 · « En une phrase » reste sur les pages ; la page artiste n’a pas de chapeau** · Décidé (7 novembre 2026)
@@ -167,3 +167,7 @@ Alternatives écartées : retirer la section des pages d’artistes ; tout garde
 **D42 · Un filtre par nom dans le répertoire des artistes** · Décidé (7 novembre 2026), à revoir au lot 4
 Le répertoire `/artistes/` a un champ qui filtre la liste par nom, sans tenir compte des accents. C’est le premier script des pages, écrit en amélioration progressive : sans JavaScript, le champ reste caché et la page montre tous les artistes. Il ajoute une façon de chercher à côté de celles que D28 veut réunir : au lot 4, décider s’il reste à côté de « Rechercher ».
 Alternative écartée : attendre « Rechercher » (lot 4).
+
+**D43 · L’adresse de la frise suit la vue, sans ajouter d’étape à l’historique** · Décidé (7 novembre 2026)
+`changerVue()` tient l’adresse à jour avec `history.replaceState`, comme `ouvrir()` le fait pour la fiche : `?mouvement=<id>` en vue mouvement, rien dans les autres vues, et le `#id` de la fiche ouverte est gardé. Un rechargement retrouve ce qui était affiché, et un `?mouvement=` ne survit pas au retour à la frise. Un `?mouvement=` inconnu est retiré de l’adresse au démarrage. Le bouton « Précédent » quitte donc la frise au lieu de revenir à la vue précédente.
+Alternative écartée : `pushState`, qui demandait d’écouter `popstate` et de redessiner la bonne vue, pour un gain modeste.

@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : phase 2, étape 2e, sous-étape 4.** La structure du site est fixée (D17 à D28), le modèle de données est en place (étape 2d), et les pages des mouvements et des artistes existent sur la branche `pages`. Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
+**Étape en cours : phase 2, étape 2f.** La structure du site est fixée (D17 à D28), le modèle de données est en place (étape 2d), et les pages des mouvements et des artistes sont en ligne (étape 2e). L’étape 2f commence par trancher D10. Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
 
 ---
 
@@ -21,14 +21,14 @@ Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la
 - **2d · Le modèle de données.** Terminé le 6 novembre 2026, sur la branche `modele-donnees`, en cinq sous-étapes et sans rien changer à l’affichage : onglet « Groupes » et colonne « Groupes » des artistes (D22) ; relations typées entre artistes et mouvements (D23) ; onglet « Glossaire » (D24) ; niveau des œuvres déduit de leur fiche, avec le gabarit en deux parties (D21, D34) ; gabarits des parcours et des comparaisons (D24, D35, D36).
 
   À chaque sous-étape, les vérifications correspondantes, et l’unicité des identifiants étendue aux nouveaux types. La branche est testée sur la version de test, puis fusionnée dans `main`, une fois les cinq sous-étapes terminées.
-- **2e · Pages mouvements et artistes.** En cours, sur la branche `pages`, en quatre sous-étapes :
-  1. **Liens.** Terminé le 7 novembre 2026. `aUnePage()` et `adresse()` décident de l’adresse de chaque élément (D40).
-  2. **Mouvements.** Terminé le 7 novembre 2026. `Base.astro` (en-tête et menu du site, fil d’Ariane), `public/pages.css` (D39), les composants de `src/components/`, le répertoire `/mouvements/` (D37) et une page par mouvement : repère chronologique, sommaire, groupes en sections, artistes, œuvres, moments clés, filiations.
-  3. **Artistes.** Terminé le 7 novembre 2026. Le répertoire `/artistes/`, avec son filtre (D42), et une page par artiste : rubriques, texte (D41), œuvres, liens.
-  4. **Ponts.** « Lire la page » dans le panneau de la frise (D19). « Voir dans la frise » mène à la vue mouvement, à l’adresse `/?mouvement=<id>` (D27, D38). Dans le panneau, un lien vers un groupe mène à la page de son mouvement, et construire.py cesse de le signaler.
+- **2e · Pages mouvements et artistes.** Terminé le 7 novembre 2026, sur la branche `pages`, en quatre sous-étapes :
+  1. **Liens.** `aUnePage()` et `adresse()` décident de l’adresse de chaque élément (D40).
+  2. **Mouvements.** `Base.astro` (en-tête et menu du site, fil d’Ariane), `public/pages.css` (D39), les composants de `src/components/`, le répertoire `/mouvements/` (D37) et une page par mouvement : repère chronologique, sommaire, groupes en sections, artistes, œuvres, moments clés, filiations.
+  3. **Artistes.** Le répertoire `/artistes/`, avec son filtre (D42), et une page par artiste : rubriques, texte (D41), œuvres, liens.
+  4. **Ponts.** « Lire la page » dans le panneau de la frise (D19). « Voir dans la frise » mène à la vue mouvement, à l’adresse `/?mouvement=<id>` (D27, D38, D43). Dans le panneau, un lien vers un groupe mène à la page de son mouvement, et construire.py cesse de le signaler.
 
-  La branche est testée sur la version de test, puis fusionnée dans `main`, une fois les quatre sous-étapes terminées.
-- **2f · Catalogue et pages œuvres.** Le répertoire `/oeuvres/`, avec ses filtres (mouvement, œuvres majeures, « Écrits et manifestes »), et la page de chaque œuvre documentée, pensée comme un cartel (D21, D25). D10 doit être tranché avant cette étape.
+  Testée sur la version de test, puis fusionnée dans `main`.
+- **2f · Catalogue et pages œuvres.** Elle commence par trancher D10. Le répertoire `/oeuvres/`, avec ses filtres (mouvement, œuvres majeures, « Écrits et manifestes »), et la page de chaque œuvre documentée, pensée comme un cartel (D21, D25). `aUnePage()` et `adresse()` y apprennent les œuvres documentées : « Lire la page » dans le panneau, les listes et les cartes des pages suivront d’eux-mêmes.
 - **2g · Référencement de base.** Titre de page, description (le résumé court du tableur), adresse canonique, sitemap.xml, robots.txt. Un contrôle des liens de `dist/` (outil à choisir à cette étape, sans dépendance si possible).
 - **2h · Finitions.** La page « À propos » et le plan du site (`/plan-du-site/`). L’Index reçoit les liens vers les nouvelles pages.
 
