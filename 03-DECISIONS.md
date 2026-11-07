@@ -95,7 +95,7 @@ Repoussé : les attributions discutées et les périodes d’activité écrites 
 **D24 · Glossaire, parcours et comparaisons passent par les sources habituelles** · Décidé (6 novembre 2026)
 Le glossaire est un onglet du tableur (ID, Terme, Définition, Voir aussi). Les fiches y renvoient avec la syntaxe habituelle, `[[ready-made]]`, vérifiée par construire.py ; aucun lien n’est ajouté automatiquement sur les mots. Les parcours et les comparaisons sont des fiches Markdown, dans `fiches/parcours/` et `fiches/comparaisons/`, dont l’en-tête YAML liste les étapes ou les deux éléments comparés. Tous ces identifiants partagent l’espace unique des autres (D9). construire.py reste la seule porte d’entrée (D7).
 
-**D25 · La frise est l’affiche, les pages sont le livre** · Décidé (6 novembre 2026)
+**D25 · La frise est l’affiche, les pages sont le livre** · Décidé (6 novembre 2026), précisé par D37
 La frise et les outils de navigation gardent le thème « Affiche » (D3) : bordures épaisses, ombres décalées, couleurs des mouvements en aplats. Les pages de lecture sont pensées comme un ouvrage édité : la typographie porte la hiérarchie, les traits sont des filets plutôt que des cadres, on laisse respirer le texte, et les cartes sont réservées aux œuvres. Les couleurs des mouvements y servent de repères, pas de décor. Les pages mouvement, artiste et œuvre ont chacune leur composition, et partagent leurs composants. La page œuvre est pensée comme un cartel, complète sans image ; la reproduction s’y ajoute quand les droits le permettent (D10).
 Alternative écartée : adoucir bordures et ombres sur tout le site, frise comprise, ce qui changeait l’identité visuelle.
 
@@ -138,3 +138,32 @@ Alternative écartée : PyYAML, une dépendance de plus pour quatre champs.
 
 **D36 · Une comparaison relie deux éléments du même genre** · Décidé (6 novembre 2026)
 Deux mouvements, deux artistes ou deux œuvres, jamais un mélange : cela précise D20. Un parcours a au moins deux étapes, de n’importe quel type. Le « Voir aussi » d’un terme du glossaire peut viser n’importe quel identifiant.
+
+**D37 · Des cartes aussi pour le répertoire des mouvements** · Décidé (7 novembre 2026)
+Sur les pages, les cartes sont réservées aux œuvres et au répertoire `/mouvements/`. Ce répertoire sert à choisir où aller, pas à lire : il tient de l’affiche, et les cartes y montrent les couleurs des mouvements. Les artistes restent en listes, partout. Précise D25.
+Alternative écartée : une liste à liseré coloré, comme pour les artistes.
+
+**D38 · La vue mouvement a pour adresse `/?mouvement=<id>`** · Décidé (7 novembre 2026)
+C’est l’adresse que vise « Voir dans la frise » depuis une page mouvement (D27). Le `#` reste réservé à la fiche ouverte, et les deux se combinent : `/?mouvement=fauvisme#matisse`. Elle est mise en place à la sous-étape 4 de l’étape 2e ; d’ici là, le lien vise `/#<id>`.
+Alternative écartée : `/#vue-<id>`, qui donnerait deux sens au même `#` et empêcherait d’y ajouter une fiche.
+
+**D39 · Les pages ont leur feuille de style, `public/pages.css`** · Décidé (7 novembre 2026)
+Chargée après style.css, elle en reprend les variables, donc le mode sombre ; la frise ne change pas d’une ligne. `body.page` annule la mise en page de la frise (hauteur de l’écran, défilement bloqué). Les classes de style.css servent à la frise : une classe des pages ne reprend jamais leurs noms (`.carte-page`, et non `.carte`).
+Alternatives écartées : tout mettre dans style.css, qui mélangerait l’affiche et le livre (D25) ; sortir les variables dans un fichier commun, ce qui déplacerait du code de la frise. À reconsidérer si pages.css doit annuler d’autres règles de style.css.
+
+**D40 · Une seule fonction décide de l’adresse d’un élément** · Décidé (7 novembre 2026)
+`aUnePage()` et `adresse()`, dans `src/lib/fiches.js`, disent si un élément a une page et où mène un lien vers lui :
+- `/mouvements/<id>/` ou `/artistes/<id>/` si sa fiche est rédigée ;
+- `/mouvements/<mouvement>/#<groupe>` pour un groupe, ou `/#<mouvement>` si ce mouvement n’a pas de page ;
+- `/#id` dans tous les autres cas.
+
+Les pages, les composants `Ligne` et `Carte`, et `markdown(md, true)` s’appuient sur elles. Le panneau de la frise garde ses liens `#id`.
+Alternative écartée : un fichier `src/lib/adresses.js`, un module de plus pour deux fonctions.
+
+**D41 · « En une phrase » reste sur les pages ; la page artiste n’a pas de chapeau** · Décidé (7 novembre 2026)
+Sur une page mouvement, le chapeau (le résumé du tableur) est une accroche, et la section « En une phrase » une définition : les deux restent. Sur une page artiste, la phrase-clé du tableur répétait presque la section : le chapeau est retiré, et la phrase-clé reste dans les bulles de la frise.
+Alternatives écartées : retirer la section des pages d’artistes ; tout garder, au prix d’une répétition.
+
+**D42 · Un filtre par nom dans le répertoire des artistes** · Décidé (7 novembre 2026), à revoir au lot 4
+Le répertoire `/artistes/` a un champ qui filtre la liste par nom, sans tenir compte des accents. C’est le premier script des pages, écrit en amélioration progressive : sans JavaScript, le champ reste caché et la page montre tous les artistes. Il ajoute une façon de chercher à côté de celles que D28 veut réunir : au lot 4, décider s’il reste à côté de « Rechercher ».
+Alternative écartée : attendre « Rechercher » (lot 4).

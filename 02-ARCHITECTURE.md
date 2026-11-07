@@ -4,18 +4,18 @@ Ce document décrit comment le site fonctionne (partie A) et ce qu’il doit dev
 
 ---
 
-# A. État actuel (novembre 2026, après l’étape 2d)
+# A. État actuel (novembre 2026, étape 2e en cours sur la branche `pages`)
 
 ## Flux des données
 ```
 donnees/frise_art_moderne_base.xlsx ─┐
                                      ├─> python construire.py ─> src/data/frise.json ─┐
 fiches/<dossier>/<id>.md ────────────┘                                                ├─> npm run build ─> dist/
-src/pages/index.astro + src/scripts/app.js + src/lib/ + public/ ──────────────────────┘
+src/pages/ + src/layouts/ + src/components/ + src/scripts/app.js + src/lib/ + public/ ┘
 ```
-Le site ne lit ni le tableur ni les fiches, seulement `frise.json`. Au build, Astro transforme `index.astro` en `dist/index.html`. Il intègre au script de la frise `frise.json`, `src/lib/` et marked, et publie ce script dans `dist/_astro/`, sous un nom qui change à chaque modification. Il copie `public/` tel quel.
+Le site ne lit ni le tableur ni les fiches, seulement `frise.json`. Au build, Astro transforme chaque fichier de `src/pages/` en une ou plusieurs pages de `dist/` : `index.astro` donne `dist/index.html`, et `mouvements/[id].astro` une page par mouvement rédigé. Il intègre au script de la frise `frise.json`, `src/lib/` et marked, et publie ce script dans `dist/_astro/`, sous un nom qui change à chaque modification. Les pages, elles, sont fabriquées entièrement au build : leur HTML contient déjà tout leur texte. Il copie `public/` tel quel.
 
-## Arborescence (branche main)
+## Arborescence (branche `pages`)
 ```
 README.md                mode d’emploi
 construire.py            tableur + fiches -> src/data/frise.json (Python, openpyxl), ≈ 490 lignes
@@ -32,14 +32,19 @@ fiches/
   _gabarits/                         un gabarit par type de fiche
   _en-attente/                       fiches sans ligne dans le tableur, ignorées par le site
 src/
-  pages/index.astro      structure de la page de la frise
+  pages/
+    index.astro          structure de la page de la frise
+    mouvements/          index.astro (répertoire), [id].astro (une page par mouvement rédigé)
+    artistes/            index.astro (répertoire et son filtre), [id].astro (une page par artiste rédigé)
+  layouts/Base.astro     gabarit des pages : <head>, en-tête et menu du site, fil d’Ariane
+  components/            morceaux communs aux pages : Ligne, Carte, EnteteFiche, Lecture
   scripts/app.js         fonctionnement de la frise, ≈ 740 lignes
-  lib/                   partagé par la frise et les futures pages (D31)
-    donnees.js           importe frise.json ; MOUV, ART, OEU, EVT, couleur, mouvementsTries
+  lib/                   partagé par la frise et les pages (D31)
+    donnees.js           importe frise.json ; MOUV, ART, OEU, EVT, GRP, couleur, mouvementsTries
     outils.js            esc, sansAccent, nomCourt, compter, estImage…
-    fiches.js            contenu des fiches (ficheOeuvre, ficheArtiste, ficheMouvement, ficheEvenement), avec marked
+    fiches.js            fiches du panneau (ficheOeuvre…), et pour les pages : aUnePage, adresse, lien, markdown, textePage
   data/frise.json        FABRIQUÉ par construire.py, commité (D8)
-public/                  copié tel quel : style.css (≈ 480 lignes), images/, favicons d’Astro (à remplacer en phase 3)
+public/                  copié tel quel : style.css (≈ 480 lignes), pages.css (≈ 200 lignes), images/, favicons d’Astro (à remplacer en phase 3)
 ```
 
 ## Le tableur
@@ -87,11 +92,11 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - **parcours** : id, titre, etapes, fiche, ficheVide
 - **comparaison** : id, titre, elements, fiche, ficheVide
 
-`fiche` contient le Markdown, ou une chaîne vide si la fiche est vide. Les listes (`autres`, `groupes`, `voirAussi`, `etapes`, `elements`) contiennent des identifiants. Une valeur inconnue est signalée ; `autres` et `voirAussi` la gardent, `groupes` l’écarte. La frise n’utilise encore ni `groupes`, ni `glossaire`, ni `parcours`, ni `comparaisons`, ni `niveau`, et n’affiche que les relations entre deux artistes.
+`fiche` contient le Markdown, ou une chaîne vide si la fiche est vide. Les listes (`autres`, `groupes`, `voirAussi`, `etapes`, `elements`) contiennent des identifiants. Une valeur inconnue est signalée ; `autres` et `voirAussi` la gardent, `groupes` l’écarte. La frise n’utilise ni `groupes`, ni `glossaire`, ni `parcours`, ni `comparaisons`, ni `niveau`, et n’affiche que les relations entre deux artistes. Les pages utilisent `groupes` et toutes les relations ; `glossaire`, `parcours`, `comparaisons` et `niveau` attendent les étapes suivantes.
 
 ## La frise
 - **index.astro** : la structure fixe de la page (script du thème dans le `<head>`, en-tête, bandeau, zone qui défile, barre du bas, bulle, panneau, `<dialog>` de l’image) et un seul script, `src/scripts/app.js`, qu’Astro traite comme un module.
-- **src/lib/** fabrique ce qui servira aussi aux pages : données, outils, contenu des fiches. Rien n’y touche à `document` ni à `window`, pour que ces fichiers fonctionnent au build.
+- **src/lib/** fabrique ce qui sert aussi aux pages : données, outils, contenu des fiches. Rien n’y touche à `document` ni à `window`, pour que ces fichiers fonctionnent au build.
 - **app.js** fait tout le reste :
   - `REGLAGES`, en tête du fichier, réunit les réglages modifiables ;
   - l’objet `etat` dit ce qui est affiché, `dessiner()` refait la frise à partir de lui, et `fenetre()` calcule la période et l’échelle.
@@ -106,8 +111,24 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - **Thème** : `data-theme` sur `<html>`, mémorisé dans `localStorage` (clé `theme`).
 - **Accessibilité**, à préserver : ARIA, focus visible, clavier, `prefers-reduced-motion`, `aria-live` du panneau coupé pendant l’Index.
 
-## style.css
-Rangé par élément de la page, dans l’ordre où on les rencontre ; chaque section a son bloc `@media (max-width: 720px)`. Le bloc `prefers-reduced-motion` est en toute fin. Les couleurs et polices sont des variables sur `:root`, et le mode sombre est dans `:root[data-theme="dark"]`. Police Archivo (Google Fonts). La couleur des mouvements vient du tableur.
+## Les pages
+- **Gabarit** : chaque page passe par `src/layouts/Base.astro`. Il pose le `<head>` (une copie de celui d’index.astro jusqu’au lot 4), l’en-tête du site avec son menu et le fil d’Ariane. Le menu ne montre que Frise, Mouvements et Artistes : une rubrique n’y entre qu’avec son contenu (D18). Pas de bouton de thème avant le lot 4 : les pages suivent le choix fait sur la frise, ou le réglage de l’appareil.
+- **Fabrication** : tout est calculé au build, depuis `frise.json`. Une page dynamique (`[id].astro`) exporte `getStaticPaths()`, qui renvoie un objet par page à fabriquer ; seuls les éléments dont `aUnePage()` est vrai en reçoivent une (D13).
+- **Adresses** : `aUnePage()` et `adresse()` (src/lib/fiches.js) sont les seules à décider où mène un lien (D40). Les composants `Ligne` et `Carte` en déduisent leur adresse et leur flèche (« Lire la page » ou « Voir dans la frise »). Le texte des fiches passe par `textePage()`, qui appelle `markdown(md, true)` et donne un id à chaque titre `##`, pour le sommaire.
+- **Composants** (`src/components/`) :
+  - `Ligne` : une ligne de liste ;
+  - `Carte` : une œuvre, ou un mouvement dans son répertoire (D37), avec l’étoile des œuvres majeures ;
+  - `EnteteFiche` : la bande de couleur, le titre, « Voir dans la frise », et le repère chronologique d’un mouvement ;
+  - `Lecture` : le sommaire « Dans cette page » et la colonne de texte.
+- **Page mouvement** : l’en-tête avec ses dates et son lieu, le repère, puis le texte, les groupes (une section et une ancre chacun), les artistes, les œuvres majeures en cartes, les autres œuvres en liste, les moments clés, les filiations et réactions.
+- **Page artiste** : l’en-tête sans chapeau (D41), les rubriques (Nationalité, Disciplines, Mouvement, Aussi, Groupes), le texte, les œuvres en cartes, les liens avec d’autres artistes et avec des mouvements.
+- **Scripts** : un seul, le filtre du répertoire des artistes (D42), en amélioration progressive.
+- « Voir dans la frise » mène pour l’instant à `/#id` ; la vue mouvement aura son adresse à la sous-étape 4 (D38).
+
+## style.css et pages.css
+style.css est rangé par élément de la page, dans l’ordre où on les rencontre ; chaque section a son bloc `@media (max-width: 720px)`. Le bloc `prefers-reduced-motion` est en toute fin. Les couleurs et polices sont des variables sur `:root`, et le mode sombre est dans `:root[data-theme="dark"]`. Police Archivo (Google Fonts). La couleur des mouvements vient du tableur.
+
+pages.css, la feuille des pages (D39), est chargée après style.css et rangée de la même façon. Elle en reprend les variables, donc le mode sombre, et annule par `body.page` la mise en page de la frise. Ses classes ne reprennent jamais un nom de style.css.
 
 ## Déploiement
 À chaque push, Cloudflare installe les dépendances et lance `npx wrangler deploy`. Wrangler lit le bloc `build` de `wrangler.jsonc`, lance `npm run build` et publie `./dist`. La Build command de l’onglet Production du tableau de bord reste vide, sans quoi le site serait fabriqué deux fois.
@@ -167,6 +188,7 @@ Ils partagent leurs composants : en-tête de fiche, fil d’Ariane, listes, cart
 ```
 src/
   layouts/Base.astro           <head>, polices, script du thème, en-tête et pied de page du site
+  components/                  les morceaux communs des gabarits
   pages/
     index.astro                la frise
     mouvements/index.astro  mouvements/[id].astro
@@ -178,11 +200,8 @@ src/
 ```
 
 ## À trancher, à l’étape indiquée
-- **2e** :
-  - l’adresse de la vue mouvement (D27) ;
-  - l’emplacement des styles des pages. Le plus simple : garder un seul style.css ;
-  - où décider qu’un élément a une page. Le plus simple : une seule fonction de `src/lib/`, qui s’appuie sur `ficheVide` et `niveau`, déjà calculés par construire.py.
-- **2f** : D10, avant le catalogue.
-- **Lot 4** : le zoom affiché lors d’une première visite ; le découpage de la suite d’app.js, si besoin (D31).
+- **Avant les premières filiations** : le sens de De → Vers dans une relation « filiation » ou « réaction ».
+- **2f** : D10, avant le catalogue ; le découpage de `src/lib/fiches.js`, si la page œuvre y ajoute trop.
+- **Lot 4** : le zoom affiché lors d’une première visite ; le découpage de la suite d’app.js, si besoin (D31) ; le filtre du répertoire des artistes face à « Rechercher » (D42).
 - **Après la phase 2** : le panneau de la frise réduit à une fiche courte (D19).
 - **Phase 5** : l’organisation de `/en/…`, avant de commencer.

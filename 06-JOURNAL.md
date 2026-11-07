@@ -11,10 +11,10 @@ Le détail des entrées jusqu’au 4 novembre 2026 est dans l’historique Git d
 Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 
 ## À régler pendant la phase 2
-- construire.py fait 488 lignes après l’étape 2d. Il reste en un seul fichier (D32) : à reconsidérer avant d’y ajouter ce que demandent les pages (étape 2e).
-- Un lien `[[id]]` vers un groupe, un terme, un parcours ou une comparaison est signalé par construire.py (paramètre `ids_pas_encore_affiches` de `verifier_liens()`), car la frise afficherait l’identifiant brut. À l’étape 2e, retirer les groupes de cet avertissement quand `lien()` saura viser `/mouvements/<mouvement>/#<groupe>` ; les termes, parcours et comparaisons, en phase 4.
+- Un lien `[[id]]` vers un groupe, un terme, un parcours ou une comparaison est signalé par construire.py (paramètre `ids_pas_encore_affiches` de `verifier_liens()`), car la frise afficherait l’identifiant brut. Sur les pages, `adresse()` sait déjà viser `/mouvements/<mouvement>/#<groupe>`, mais le panneau de la frise donne encore `#<groupe>`. À la sous-étape 4 de l’étape 2e, retirer les groupes de cet avertissement ; les termes, parcours et comparaisons, en phase 4.
+- `src/lib/fiches.js` réunit maintenant la fabrique du panneau et des fonctions propres aux pages (`aUnePage`, `adresse`, `textePage`). À reconsidérer à l’étape 2f, quand la page œuvre ajoutera les siennes.
+- Le sens d’une relation « filiation » ou « réaction » n’est pas fixé : que veut dire De → Vers ? La page mouvement affiche donc le type de la relation sans son sens. À décider avant de saisir les premières filiations.
 - `NOMS_COURTS` (src/lib/outils.js) est une donnée rangée dans le code. Si deux artistes d’un même mouvement partagent un nom de famille, les listes de la fiche mouvement les confondront.
-- `lien()` (src/lib/fiches.js) donne toujours `#id`. À l’étape 2e, il devra donner l’adresse de la page, selon le type de l’élément (ARCHITECTURE, partie B, « Liens »).
 - L’onglet « Influences » et la clé `influences` de frise.json contiennent maintenant toutes les relations (D23) : leur nom est trompeur. Un renommage toucherait le tableur, construire.py et src/lib/fiches.js.
 
 ## Plus tard, sans urgence
@@ -26,14 +26,23 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - Depuis la vue d’ensemble, un clic sur une décennie ramène au dernier zoom choisi, pas forcément à « Détail ».
 - L’Index ne garde pas sa position de défilement au retour, et n’a pas d’adresse `#index`.
 - En vue mouvement, des disciplines longues passent sur deux lignes et agrandissent la ligne de l’artiste.
-- Thème : la clé `theme` et les valeurs `light`/`dark` sont écrites à deux endroits (script du `<head>` et app.js). Après un clic, la bulle du bouton garde l’ancien libellé jusqu’au survol suivant.
+- Thème : la clé `theme` et les valeurs `light`/`dark` sont écrites à trois endroits (le script du `<head>` d’index.astro, celui de Base.astro, et app.js). Après un clic, la bulle du bouton garde l’ancien libellé jusqu’au survol suivant.
 - En-tête : la hauteur du bouton de thème (`2.25rem`) et le `margin-top` de la case « Œuvres majeures seulement » (`0.3rem`) sont calés à la main sur les boutons des mouvements.
 - style.css : `--trait` n’est utilisée nulle part.
 - `verifier_image()` ne voit pas une différence de majuscules entre le tableur et le nom du fichier : Windows les confond, Cloudflare non, et l’image serait cassée en ligne. Garder des noms d’images en minuscules.
 - Astro est noté `^7.4.4` dans `package.json`, alors que marked et wrangler sont en version exacte. `package-lock.json` le protège déjà : à fixer en version exacte par cohérence, dans une branche testée.
 - `ONGLETS_INDEX` (titres des onglets de l’Index) est dans src/lib/outils.js parce que `compter()` en a besoin. À séparer si les pages ont un jour d’autres mots à compter.
-- construire.py : `lire_groupes_artiste()` et `lire_autres()` se ressemblent (découpage, avertissement, suggestion d’identifiant), mais traitent différemment une valeur inconnue : la première l’écarte, la seconde la garde en texte.
+
+**Pages**
+- Le `<head>` est écrit deux fois, dans index.astro et dans src/layouts/Base.astro, jusqu’au lot 4 : un changement des polices ou du script du thème se fait dans les deux.
+- Le tri des œuvres par année est écrit à trois endroits, et pas de la même façon : `listeOeuvres()` (fiches.js) met une œuvre sans année en tête, les pages la mettent en fin de liste.
+- `textePage()` suppose que marked écrit chaque titre `##` en `<h2>` sans attribut, dans l’ordre du Markdown. Une ligne `## ` dans un bloc de code décalerait les ids du sommaire.
+- Répertoire des artistes : quand le filtre cache le premier mouvement, le suivant garde sa marge du haut.
+- Le chapeau du répertoire des mouvements (« Du premier Salon impressionniste… ») est écrit dans le code : il ne suit pas un changement du tableur.
+
 **Fiches et construire.py**
+- construire.py fait 488 lignes ; l’étape 2e n’y a rien ajouté. Il reste en un seul fichier (D32), à reconsidérer s’il grossit encore.
+- construire.py : `lire_groupes_artiste()` et `lire_autres()` se ressemblent (découpage, avertissement, suggestion d’identifiant), mais traitent différemment une valeur inconnue : la première l’écarte, la seconde la garde en texte.
 - Une rubrique laissée vide dans une fiche rédigée affiche son titre seul (seule l’analyse vide est retirée, D34). Piste : retirer toute rubrique vide, après avoir vérifié l’effet sur les fiches mouvements et artistes déjà rédigées.
 - « Voir aussi » garde dans frise.json un identifiant inconnu (signalé), alors qu’un groupe inconnu est écarté.
 - `lire_entete()` ne lit que des lignes `clé: valeur` : une liste YAML écrite sur plusieurs lignes (`- monet`) serait lue comme vide. Pour un parcours ou une comparaison, l’avertissement sur le nombre d’éléments le signale.
@@ -41,7 +50,7 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 
 **À tester**
 - La coupure d’`aria-live` pendant l’Index n’a pas été testée avec un vrai lecteur d’écran. À faire avant l’ouverture au public.
-- La flèche ↗ de l’Index n’existe peut-être pas dans Archivo : vérifier son rendu sur plusieurs navigateurs.
+- La flèche ↗ s’affiche bien dans Chrome, avec Archivo. Reste à vérifier sur Safari et Firefox.
 
 **Contenu**
 - « Nationalité … » suppose que la colonne « Nationalité » est au féminin. Rien ne signale une forme masculine.
@@ -59,6 +68,11 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 ---
 
 # Entrées
+
+## 7 novembre 2026 · Étape 2e, sous-étapes 1 à 3 : pages mouvements et artistes
+**Fait** : l’étape 2e est découpée en quatre sous-étapes, sur la branche `pages`. Sous-étape 1 : `aUnePage()` et `adresse()` (src/lib/fiches.js) décident de l’adresse de chaque élément ; `lien()` et `markdown()` reçoivent `surPage` ; `GRP` rejoint donnees.js. Le panneau est inchangé, et une page de test non commitée a vérifié les adresses. Sous-étape 2 : `Base.astro` (head, menu Frise / Mouvements / Artistes, fil d’Ariane), `public/pages.css`, quatre composants dans `src/components/` (Ligne, Carte, EnteteFiche, Lecture), le répertoire `/mouvements/` en cartes et une page par mouvement : repère chronologique en bande sous l’en-tête, sommaire fait de vrais liens (`textePage()`), groupes avec leur ancre, œuvres majeures en cartes avec l’étoile, autres œuvres en liste. Sous-étape 3 : le répertoire `/artistes/`, rangé par mouvement, avec un filtre par nom (premier script des pages), et une page par artiste. Le design part du prototype de structure, retouché en cours de route. Testé en local et sur la version de test, adresses avec et sans barre finale comprises. Branche non fusionnée.
+**Reste à faire** : la sous-étape 4 (« Lire la page », « Voir dans la frise » vers la vue mouvement, `?mouvement=`, avertissement des groupes), dans une nouvelle conversation, puis la fusion dans `main`.
+**Décisions prises** : D37 à D42 ; D25 est précisé par D37.
 
 ## 6 novembre 2026 · Étape 2d terminée (sous-étapes 3 à 5)
 **Fait** : sous-étape 3, onglet « Glossaire » (ID, Terme, Définition, Voir aussi, Notes / corrections), ajouté directement dans le XML du tableur ; construire.py signale un terme sans nom ou sans définition, et un « Voir aussi » inconnu ou qui renvoie au terme lui-même. Sous-étape 4 : `## Analyse` sépare la présentation de l’analyse (D34) ; `niveau_oeuvre()` en déduit le niveau de chaque œuvre, retire une analyse vide du Markdown et signale une analyse sans présentation ou un titre en double ; la règle des 20 caractères devient `sans_texte()`. Nouveau gabarit œuvre ; les 104 fiches œuvres vides y sont passées par un script ponctuel, non commité. Sous-étape 5 : gabarits des parcours et des comparaisons, lus par `lire_articles()` et vérifiés par `verifier_articles()` (D35, D36). À chaque sous-étape, frise.json n’a changé que par les ajouts prévus. Testé sur la version de test ; fusionné dans `main`.

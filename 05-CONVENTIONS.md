@@ -14,18 +14,21 @@ Les règles du code, du contenu et de Git. Le nouveau code doit ressembler à l�
 - Un commentaire au-dessus de chaque bloc dont l’intention n’est pas évidente : il dit pourquoi, pas ce que dit déjà le code.
 - Tout texte venant des données et inséré dans du HTML passe par `esc()`.
 - Rien dans `src/lib/` ne touche à `document` ni à `window`.
+- Dans un gabarit Astro, un texte venant des données s’insère avec `{…}`, qu’Astro échappe lui-même ; `set:html` est réservé au HTML fabriqué par `src/lib/` (le texte des fiches).
+- Un script de page fonctionne en amélioration progressive : sans JavaScript, la page reste complète, et le script n’affiche que ce qu’il sait faire marcher.
 
 ## CSS
 - Couleurs, polices et tailles passent par les variables de `:root`, et chaque nouvelle couleur a sa valeur pour le mode sombre. Exceptions voulues, identiques dans les deux modes :
   - le blanc et les noirs translucides posés sur les couleurs des mouvements ;
   - `--grille-bande` ;
   - le voile de l’image en grand (`::backdrop` ne voit pas toujours les variables).
-- Pas de style écrit en dur dans les gabarits Astro. Dans app.js, l’attribut `style` ne sert qu’aux valeurs calculées : positions, largeurs, couleur du mouvement (`--c`).
+- Pas de style écrit en dur dans les gabarits Astro. Dans app.js comme dans les gabarits, l’attribut `style` ne sert qu’aux valeurs calculées : positions, largeurs, couleur du mouvement (`--c`).
+- Les règles de la frise vont dans `public/style.css`, celles des pages dans `public/pages.css` (D39). pages.css est chargé après style.css : une classe des pages ne reprend jamais un nom de style.css (`.carte`, `.entete`, `.bande`, `.resume`…).
 - Une nouvelle règle va dans la section de son élément, et sa version téléphone dans le bloc `@media (max-width: 720px)` de cette section.
 - On garde le focus visible et le respect de `prefers-reduced-motion`.
 - La frise est l’affiche, les pages sont le livre (D25) :
   - la frise et la navigation gardent leurs bordures épaisses et leurs ombres décalées ;
-  - les pages utilisent des filets et laissent la typographie porter la hiérarchie, et les cartes y sont réservées aux œuvres ;
+  - les pages utilisent des filets et laissent la typographie porter la hiérarchie, et les cartes y sont réservées aux œuvres et au répertoire des mouvements (D37) ;
   - une page reste complète sans image.
 
 ## Python (construire.py)
