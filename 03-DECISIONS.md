@@ -36,9 +36,9 @@ Alternative écartée : faire lire les fiches directement par Astro (les « cont
 **D9 · Des identifiants et des adresses stables** · Décidé (novembre 2026)
 L’identifiant d’un élément (ex. `matisse`) est aussi le nom de sa fiche et la fin de son adresse (`/artistes/matisse/`). Tant que le site n’est pas public, un identifiant peut encore changer. Une fois le site public, on ne le change plus : cela casserait les liens et le référencement. La version anglaise vivra sous `/en/`. L’organisation des adresses à l’intérieur de `/en/` sera décidée au début de la phase 5.
 
-**D10 · N’afficher que des images dont les droits le permettent** · Proposé, reporté (novembre 2026)
-On s’appuie sur la colonne « Domaine public ? » du tableur. Une œuvre encore protégée s’affiche sans image.
-À trancher avant d’ajouter d’autres images.
+**D10 · N’afficher que des images dont les droits le permettent** · Décidé (7 novembre 2026)
+Une œuvre n’affiche son image que si elle est dans le domaine public en France : son artiste est mort depuis plus de 70 ans, comptés à partir du 1er janvier qui suit sa mort (en 2026 : mort en 1955 ou avant). construire.py le calcule depuis l’année de décès et l’année du build : le site suit le calendrier sans qu’on y touche. Une image saisie pour une œuvre protégée est retirée de frise.json et signalée. La colonne « Domaine public ? » ne peut que forcer la protection, pour une exception ; un désaccord entre elle et le calcul est signalé. La photo elle-même doit être libre (domaine public, CC0, ou licence qui demande seulement un crédit) : elle est rangée dans `public/images/`, et sa source va dans la colonne « Crédit image ». Une œuvre protégée affiche à la place un encart qui l’explique, avec sa date d’entrée dans le domaine public et un lien vers sa page sur le site du musée (colonne « Lien de l’œuvre »), s’il est rempli.
+Alternative écartée : remplir « Domaine public ? » à la main et la faire lire. C’est une double saisie, qui ne suit pas le calendrier.
 
 **D11 · Plus de GitHub Pages, sans redirection de l’ancienne adresse** · Décidé (novembre 2026)
 GitHub Pages est désactivé et `docs/` supprimé : l’ancienne adresse en github.io renvoie une erreur 404. C’est le choix le plus simple : rien à maintenir jusqu’à la phase 3.
@@ -147,13 +147,13 @@ Alternative écartée : une liste à liseré coloré, comme pour les artistes.
 C’est l’adresse que vise « Voir dans la frise » depuis une page mouvement (D27). Le `#` reste réservé à la fiche ouverte, et les deux se combinent : `/?mouvement=fauvisme#matisse`. Elle est en place depuis la sous-étape 4 de l’étape 2e (7 novembre 2026), et l’adresse suit la vue (D43).
 Alternative écartée : `/#vue-<id>`, qui donnerait deux sens au même `#` et empêcherait d’y ajouter une fiche.
 
-**D39 · Les pages ont leur feuille de style, `public/pages.css`** · Décidé (7 novembre 2026)
+**D39 · Les pages ont leur feuille de style, `public/pages.css`** · Décidé (7 novembre 2026), précisé par D44
 Chargée après style.css, elle en reprend les variables, donc le mode sombre ; la frise ne change pas d’une ligne. `body.page` annule la mise en page de la frise (hauteur de l’écran, défilement bloqué). Les classes de style.css servent à la frise : une classe des pages ne reprend jamais leurs noms (`.carte-page`, et non `.carte`).
 Alternatives écartées : tout mettre dans style.css, qui mélangerait l’affiche et le livre (D25) ; sortir les variables dans un fichier commun, ce qui déplacerait du code de la frise. À reconsidérer si pages.css doit annuler d’autres règles de style.css.
 
 **D40 · Une seule fonction décide de l’adresse d’un élément** · Décidé (7 novembre 2026)
 `aUnePage()` et `adresse()`, dans `src/lib/fiches.js`, disent si un élément a une page et où mène un lien vers lui :
-- `/mouvements/<id>/` ou `/artistes/<id>/` si sa fiche est rédigée ;
+- `/mouvements/<id>/` ou `/artistes/<id>/` si sa fiche est rédigée, `/oeuvres/<id>/` si l’œuvre est documentée (depuis l’étape 2f) ;
 - `/mouvements/<mouvement>/#<groupe>` pour un groupe, ou `/#<mouvement>` si ce mouvement n’a pas de page ;
 - `/#id` dans tous les autres cas.
 
@@ -171,3 +171,11 @@ Alternative écartée : attendre « Rechercher » (lot 4).
 **D43 · L’adresse de la frise suit la vue, sans ajouter d’étape à l’historique** · Décidé (7 novembre 2026)
 `changerVue()` tient l’adresse à jour avec `history.replaceState`, comme `ouvrir()` le fait pour la fiche : `?mouvement=<id>` en vue mouvement, rien dans les autres vues, et le `#id` de la fiche ouverte est gardé. Un rechargement retrouve ce qui était affiché, et un `?mouvement=` ne survit pas au retour à la frise. Un `?mouvement=` inconnu est retiré de l’adresse au démarrage. Le bouton « Précédent » quitte donc la frise au lieu de revenir à la vue précédente.
 Alternative écartée : `pushState`, qui demandait d’écouter `popstate` et de redessiner la bonne vue, pour un gain modeste.
+
+**D44 · Un élément commun à la frise et aux pages garde ses classes** · Décidé (7 novembre 2026)
+Un morceau de HTML fabriqué par `src/lib/` pour le panneau et pour les pages (l’encart d’une œuvre protégée, `.encart-droits`), ou un élément de la frise réutilisé tel quel sur une page (la fenêtre d’image `.visionneuse`), garde le même nom de classe des deux côtés. style.css range ses règles sous `.fiche`, pages.css sous `.texte` ; une classe déjà complète dans style.css (`.visionneuse`) n’est pas redéfinie dans pages.css. Le texte n’existe ainsi qu’en un exemplaire (D15). Précise D39, dont la règle reste vraie pour tout le reste.
+Alternative écartée : un composant Astro avec ses propres classes, qui aurait recopié la phrase de l’encart.
+
+**D45 · La page œuvre est un cartel, sans sommaire** · Décidé (7 novembre 2026)
+La page œuvre n’utilise pas le composant `Lecture` : le texte d’une œuvre est court et se lit d’un trait. Sous l’en-tête (technique, date, « Œuvre majeure », titre, « Voir dans la frise »), une seule colonne : l’image et sa légende de cartel, ou l’encart des droits (D10), les rubriques Artiste, Mouvement et Où la voir entre deux filets, la présentation, l’analyse, puis « Du même artiste », en cartes avec une vignette. Un clic sur l’image l’ouvre en grand dans un `<dialog>`, en amélioration progressive. La composition s’inspire d’une maquette Lovable.
+Alternative écartée : les sections repliables de cette maquette, qui cachaient le texte derrière des clics.

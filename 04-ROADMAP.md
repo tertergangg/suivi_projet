@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : phase 2, étape 2f.** La structure du site est fixée (D17 à D28), le modèle de données est en place (étape 2d), et les pages des mouvements et des artistes sont en ligne (étape 2e). L’étape 2f commence par trancher D10. Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
+**Étape en cours : phase 2, étape 2f, sous-étape 3 (catalogue `/oeuvres/`).** La structure du site est fixée (D17 à D28), le modèle de données est en place (étape 2d), et les pages des mouvements et des artistes sont en ligne (étape 2e). Dans l’étape 2f, D10 est tranchée et appliquée au panneau, et les œuvres documentées ont leur page, sur la branche `oeuvres`. Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
 
 ---
 
@@ -28,7 +28,12 @@ Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la
   4. **Ponts.** « Lire la page » dans le panneau de la frise (D19). « Voir dans la frise » mène à la vue mouvement, à l’adresse `/?mouvement=<id>` (D27, D38, D43). Dans le panneau, un lien vers un groupe mène à la page de son mouvement, et construire.py cesse de le signaler.
 
   Testée sur la version de test, puis fusionnée dans `main`.
-- **2f · Catalogue et pages œuvres.** Elle commence par trancher D10. Le répertoire `/oeuvres/`, avec ses filtres (mouvement, œuvres majeures, « Écrits et manifestes »), et la page de chaque œuvre documentée, pensée comme un cartel (D21, D25). `aUnePage()` et `adresse()` y apprennent les œuvres documentées : « Lire la page » dans le panneau, les listes et les cartes des pages suivront d’eux-mêmes.
+- **2f · Catalogue et pages œuvres.** En cours, sur la branche `oeuvres`, en trois sous-étapes :
+  1. **Droits des images.** Terminé le 7 novembre 2026. D10 est tranchée : construire.py calcule le domaine public, retire les images des œuvres protégées et lit les nouvelles colonnes « Crédit image » et « Lien de l’œuvre ». Dans le panneau, une œuvre protégée affiche un encart à la place de l’image, et l’image d’une œuvre libre a son crédit. La technique prend une majuscule, le sous-titre de l’œuvre grandit, et les intertitres `###` du panneau passent sous les `##`.
+  2. **Page œuvre.** Terminé le 7 novembre 2026. `aUnePage()` et `adresse()` apprennent les œuvres documentées. Chaque œuvre documentée a sa page, en cartel et sans sommaire (D45) : image en grand dans un `<dialog>`, encart des droits, « Du même artiste » en cartes avec vignette (`Carte.astro` reçoit l’option `vignette`). Testé avec une fiche provisoire, non commitée : aucune œuvre n’est encore documentée.
+  3. **Catalogue.** Le répertoire `/oeuvres/`, avec ses filtres (mouvement, œuvres majeures, « Écrits et manifestes »), et l’entrée « Œuvres » dans le menu. Le fil d’Ariane des pages œuvres y mène déjà.
+
+  La branche est testée sur la version de test, puis fusionnée dans `main`, une fois les trois sous-étapes terminées.
 - **2g · Référencement de base.** Titre de page, description (le résumé court du tableur), adresse canonique, sitemap.xml, robots.txt. Un contrôle des liens de `dist/` (outil à choisir à cette étape, sans dépendance si possible).
 - **2h · Finitions.** La page « À propos » et le plan du site (`/plan-du-site/`). L’Index reçoit les liens vers les nouvelles pages.
 
@@ -36,7 +41,9 @@ Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la
 
 ## En parallèle · Écriture
 L’écriture n’attend pas le code, et c’est elle qui fixe le rythme du site.
-- Documenter les œuvres majeures (35 aujourd’hui). Les 104 fiches œuvres sont au nouveau gabarit : la présentation suffit, l’analyse sous `## Analyse` est facultative (D34). Ces premières fiches servent aussi à tester la page œuvre (étape 2f).
+- Documenter les œuvres majeures (35 aujourd’hui). Les 104 fiches œuvres sont au nouveau gabarit : la présentation suffit, l’analyse sous `## Analyse` est facultative (D34). Aucune n’est encore documentée : la page œuvre n’a été testée qu’avec une fiche provisoire.
+- Ajouter des images pour les œuvres du domaine public (62 sur 104 en 2026), dans `public/images/`, en minuscules, avec leur crédit (D10). Remplir « Lien de l’œuvre » pour les œuvres protégées.
+- Au premier build de 2027, Pollock et Nolde entrent dans le domaine public : construire.py le signalera, et il faudra passer leur cellule « Domaine public ? » à « Oui ».
 - Arrêter la liste des groupes et écrire leur résumé d’une phrase, dans l’onglet « Groupes » du tableur (seul le néo-impressionnisme y est), puis remplir la colonne « Groupes » des artistes concernés. Pistes tirées des fiches : Die Brücke et Der Blaue Reiter (expressionnisme), néo-impressionnisme et synthétisme (post-impressionnisme), suprématisme et De Stijl (abstraction), action painting et color field (expressionnisme abstrait).
 - Ajouter les relations entre mouvements (filiation, réaction), avec leur explication, et compléter les explications des 12 relations entre artistes.
 - Avant de saisir les filiations et les réactions, fixer leur sens : que veut dire De → Vers ? La page mouvement l’affichera ensuite.
@@ -71,9 +78,6 @@ La rubrique de D20, qui n’apparaît dans le menu qu’avec son contenu minimum
 
 ## Phase 5 · Version anglaise
 L’organisation des fichiers et des adresses (`/en/…`) est à décider avant de commencer.
-
-## Après D10
-- Œuvre protégée : message du type « Nous n’avons pas encore les droits pour afficher cette œuvre, mais vous pouvez la retrouver ici », avec un lien vers le site du musée.
 
 ## Repoussé, sans date
 - Une page propre pour un groupe qui reçoit un texte développé (D22).

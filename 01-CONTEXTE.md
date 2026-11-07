@@ -25,7 +25,7 @@ Térence, étudiant, seul à développer et à maintenir le site. Il n’est pas
 - **Coût** : nul, en dehors du nom de domaine.
 - **Simplicité** : une seule personne, débutante, maintient le site. Une solution simple et compréhensible vaut mieux qu’une solution techniquement élégante.
 - **Écriture** : tout le contenu est écrit par l’auteur seul. C’est le principal goulot d’étranglement du projet : une fonction qui demande beaucoup de texte attend que ce texte existe.
-- **Droits** : une grande partie du corpus est encore protégée par le droit d’auteur en France (Picasso, Dalí, Magritte, Duchamp, Pollock, Rothko…). Le site doit donc être beau et complet sans image. Le tableur prévoit une colonne « Domaine public ? » pour les artistes et les œuvres (voir D10).
+- **Droits** : une grande partie du corpus est encore protégée par le droit d’auteur en France (Picasso, Dalí, Magritte, Duchamp, Pollock, Rothko…). Le site doit donc être beau et complet sans image. construire.py calcule le domaine public d’après la date de décès de l’artiste : seule une œuvre libre affiche son image ; une œuvre protégée affiche un encart qui l’explique, avec un lien vers le musée (D10).
 
 ## Le contenu
 - Le **tableur Excel** `donnees/frise_art_moderne_base.xlsx` est la base de données du site. Il contient les mouvements, les artistes, les œuvres, les événements et les relations (onglet « Influences »). Il est modifié dans Excel.

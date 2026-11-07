@@ -11,7 +11,9 @@ Le détail des entrées jusqu’au 4 novembre 2026 est dans l’historique Git d
 Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 
 ## À régler pendant la phase 2
-- `src/lib/fiches.js` réunit la fabrique du panneau et des fonctions propres aux pages (`aUnePage`, `adresse`, `textePage`) ; la sous-étape 4 de l’étape 2e y a ajouté `lirePage()` et `destinationPanneau()`. À reconsidérer à l’étape 2f, quand la page œuvre ajoutera les siennes.
+- `src/lib/fiches.js` réunit la fabrique du panneau et des fonctions propres aux pages (`aUnePage`, `adresse`, `textePage`) ; l’étape 2e y a ajouté `lirePage()` et `destinationPanneau()`, l’étape 2f `encartDroits()` et `visuelOeuvre()`. À reconsidérer à la fin de l’étape 2f.
+- Sur la branche `oeuvres`, le lien « Œuvres » du fil d’Ariane des pages œuvres renvoie une erreur 404 jusqu’au catalogue (sous-étape 3).
+- Catalogue : construire.py met maintenant une majuscule à la technique. Le filtre « Écrits et manifestes » devra comparer « Texte », et non « texte ».
 - Le sens d’une relation « filiation » ou « réaction » n’est pas fixé : que veut dire De → Vers ? La page mouvement affiche donc le type de la relation sans son sens. À décider avant de saisir les premières filiations.
 - `NOMS_COURTS` (src/lib/outils.js) est une donnée rangée dans le code. Si deux artistes d’un même mouvement partagent un nom de famille, les listes de la fiche mouvement les confondront.
 - L’onglet « Influences » et la clé `influences` de frise.json contiennent maintenant toutes les relations (D23) : leur nom est trompeur. Un renommage toucherait le tableur, construire.py et src/lib/fiches.js.
@@ -30,13 +32,16 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - En-tête : la hauteur du bouton de thème (`2.25rem`) et le `margin-top` de la case « Œuvres majeures seulement » (`0.3rem`) sont calés à la main sur les boutons des mouvements.
 - style.css : `--trait` n’est utilisée nulle part.
 - `verifier_image()` ne voit pas une différence de majuscules entre le tableur et le nom du fichier : Windows les confond, Cloudflare non, et l’image serait cassée en ligne. Garder des noms d’images en minuscules.
+- `verifier_image()` accepte encore une image hébergée sur un autre site (`http…`), alors que D10 range les images dans `public/images/`. Piste : un avertissement.
 - Astro est noté `^7.4.4` dans `package.json`, alors que marked et wrangler sont en version exacte. `package-lock.json` le protège déjà : à fixer en version exacte par cohérence, dans une branche testée.
 - `ONGLETS_INDEX` (titres des onglets de l’Index) est dans src/lib/outils.js parce que `compter()` en a besoin. À séparer si les pages ont un jour d’autres mots à compter.
 
 **Pages**
 - Le `<head>` est écrit deux fois, dans index.astro et dans src/layouts/Base.astro, jusqu’au lot 4 : un changement des polices ou du script du thème se fait dans les deux.
 - Le libellé « Lire la page ↗ » est écrit à trois endroits : `lirePage()` (src/lib/fiches.js), Ligne.astro et Carte.astro.
-- Le tri des œuvres par année est écrit à trois endroits, et pas de la même façon : `listeOeuvres()` (fiches.js) met une œuvre sans année en tête, les pages la mettent en fin de liste.
+- Le tri des œuvres par année est écrit à quatre endroits (pages mouvement, artiste et œuvre, `listeOeuvres()`), et pas de la même façon : `listeOeuvres()` met une œuvre sans année en tête, les pages la mettent en fin de liste.
+- L’encart d’une œuvre protégée a ses règles CSS en deux exemplaires, dans style.css et pages.css (D44) : voulu, l’affiche et le livre n’ont pas le même dessin, mais un changement de structure se fait dans les deux.
+- Les cartes « Du même artiste » montrent presque toutes l’aplat « Image à venir » : une seule œuvre a une image.
 - `textePage()` suppose que marked écrit chaque titre `##` en `<h2>` sans attribut, dans l’ordre du Markdown. Une ligne `## ` dans un bloc de code décalerait les ids du sommaire.
 - Répertoire des artistes : quand le filtre cache le premier mouvement, le suivant garde sa marge du haut.
 - Le chapeau du répertoire des mouvements (« Du premier Salon impressionniste… ») est écrit dans le code : il ne suit pas un changement du tableur.
@@ -54,9 +59,12 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - La coupure d’`aria-live` pendant l’Index n’a pas été testée avec un vrai lecteur d’écran. À faire avant l’ouverture au public.
 - La flèche ↗ s’affiche bien dans Chrome, avec Archivo. Reste à vérifier sur Safari et Firefox.
 - Le lien vers un groupe dont le mouvement n’a pas de page (il ouvre alors la fiche du mouvement dans le panneau) n’a pas pu être testé : les 9 mouvements sont rédigés.
+- Panneau : les intertitres `###` sont maintenant plus petits que les `##`. Vérifier l’effet sur les fiches mouvements et artistes qui en utilisent.
+- La page œuvre n’a été testée qu’avec une fiche provisoire : à revoir avec la première vraie œuvre documentée, et une œuvre protégée avec un « Lien de l’œuvre ».
 
 **Contenu**
 - « Nationalité … » suppose que la colonne « Nationalité » est au féminin. Rien ne signale une forme masculine.
+- Le domaine public est calculé d’après l’année du build : au premier build de 2027, construire.py signalera Pollock et Nolde, dont la cellule « Domaine public ? » dira encore « Non ».
 - Les fiches œuvres créées avec l’ancien gabarit gardent une section « Sources » vide. Une fiche rédigée qui l’aurait gardée affichera ce titre et une puce vide.
 - Les titres du gabarit œuvre (« Ce qu'on voit », « l'audace ») ont une apostrophe droite, et `typo()` ne s’applique pas au Markdown des fiches.
 
@@ -71,6 +79,11 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 ---
 
 # Entrées
+
+## 7 novembre 2026 · Étape 2f, sous-étapes 1 et 2 : droits des images et page œuvre
+**Fait** : sur la branche `oeuvres`. Sous-étape 1 : D10 tranchée. construire.py calcule le domaine public (année de décès + 71, comparée à l’année du build), retire l’image d’une œuvre protégée et signale les écarts avec la colonne « Domaine public ? ». Le tableur reçoit, par son XML, les colonnes « Crédit image » et « Lien de l’œuvre » ; le Lisez-moi est mis à jour. Dans le panneau : encart des œuvres protégées, crédit sous l’image, sous-titre de l’œuvre agrandi, technique en majuscule, intertitres `###` sous les `##`. Sous-étape 2 : `aUnePage()` et `adresse()` apprennent les œuvres documentées ; une page par œuvre, en cartel (D45), avec l’image en grand dans un `<dialog>` et « Du même artiste » en cartes avec vignette. Testé en local avec une fiche provisoire, restaurée avant le commit. Branche non fusionnée.
+**Reste à faire** : la sous-étape 3 (catalogue `/oeuvres/`, ses filtres, l’entrée « Œuvres » du menu), dans une nouvelle conversation, puis la version de test et la fusion dans `main`.
+**Décisions prises** : D10 passe à « Décidé » ; D44, D45 ; D39 et D40 précisées.
 
 ## 7 novembre 2026 · Étape 2e terminée (sous-étape 4 : ponts)
 **Fait** : sous-étape 4, en trois commits sur la branche `pages`. Liens de groupe : dans le panneau, `destinationPanneau()` mène `[[groupe]]` à la section du groupe sur la page de son mouvement (ou, si ce mouvement n’a pas de page, à sa fiche dans le panneau) ; le lien affiche le nom du groupe et non son identifiant, sur les pages comme dans le panneau ; construire.py cesse de signaler ces liens. « Lire la page » : `lirePage()` ajoute un lien bordé sous le sous-titre des fiches qui ont une page (mouvements et artistes, les œuvres suivront à l’étape 2f), aligné sur « Explorer… » par le bloc flex `.actions-fiche`. Vue mouvement : son adresse `/?mouvement=<id>` (D38) est lue au démarrage et tenue à jour par `changerVue()` (D43) ; « Voir dans la frise » d’une page mouvement y mène. Testé en local et sur la version de test ; branche `pages` fusionnée dans `main`.

@@ -23,7 +23,7 @@ Les règles du code, du contenu et de Git. Le nouveau code doit ressembler à l�
   - `--grille-bande` ;
   - le voile de l’image en grand (`::backdrop` ne voit pas toujours les variables).
 - Pas de style écrit en dur dans les gabarits Astro. Dans app.js comme dans les gabarits, l’attribut `style` ne sert qu’aux valeurs calculées : positions, largeurs, couleur du mouvement (`--c`).
-- Les règles de la frise vont dans `public/style.css`, celles des pages dans `public/pages.css` (D39). pages.css est chargé après style.css : une classe des pages ne reprend jamais un nom de style.css (`.carte`, `.entete`, `.bande`, `.resume`…).
+- Les règles de la frise vont dans `public/style.css`, celles des pages dans `public/pages.css` (D39). pages.css est chargé après style.css : une classe des pages ne reprend jamais un nom de style.css (`.carte`, `.entete`, `.bande`, `.resume`…). Seule exception, un élément commun à la frise et aux pages (D44) : il garde ses classes, rangées sous `.fiche` dans style.css et sous `.texte` dans pages.css.
 - Une nouvelle règle va dans la section de son élément, et sa version téléphone dans le bloc `@media (max-width: 720px)` de cette section.
 - On garde le focus visible et le respect de `prefers-reduced-motion`.
 - La frise est l’affiche, les pages sont le livre (D25) :
@@ -57,7 +57,8 @@ Les règles du code, du contenu et de Git. Le nouveau code doit ressembler à l�
 ## Tableur
 - Les relations n’utilisent que les types de D23 : `influence`, `collaboration`, `rivalité`, `filiation`, `réaction`. Une explication peut manquer, mais on n’en invente jamais.
 - Une liste dans une cellule : des identifiants séparés par des virgules.
-- On ne saisit pas ce qui se calcule : contemporains, période d’un artiste dans un mouvement, listes d’œuvres ou d’artistes.
+- On ne saisit pas ce qui se calcule : contemporains, période d’un artiste dans un mouvement, listes d’œuvres ou d’artistes, domaine public (D10).
+- Une image d’œuvre : un fichier de `public/images/`, au nom en minuscules, seulement pour une œuvre du domaine public, avec sa source dans « Crédit image » (D10). La page d’une œuvre protégée sur le site du musée va dans « Lien de l’œuvre », jamais dans « Lien image ».
 - Le tableur ne s’enregistre jamais avec openpyxl, qui effacerait ses listes déroulantes. Une modification par script passe par le XML du fichier, puis on compare toutes les cellules avec l’original.
 
 ## Typographie des textes affichés
