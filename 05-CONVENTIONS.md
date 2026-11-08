@@ -15,6 +15,7 @@ Les règles du code, du contenu et de Git. Le nouveau code doit ressembler à l�
 - Tout texte venant des données et inséré dans du HTML passe par `esc()`.
 - Rien dans `src/lib/` ne touche à `document` ni à `window`.
 - Dans un gabarit Astro, un texte venant des données s’insère avec `{…}`, qu’Astro échappe lui-même ; `set:html` est réservé au HTML fabriqué par `src/lib/` (le texte des fiches).
+- Chaque page passe à `Base.astro` une `description` d’une phrase : tirée du tableur pour une fiche, sans balise si la cellule est vide ; écrite dans l’en-tête Astro pour une page fixe, avec ses nombres calculés.
 - Un script de page fonctionne en amélioration progressive : sans JavaScript, la page reste complète, et le script n’affiche que ce qu’il sait faire marcher.
 
 ## CSS
@@ -77,6 +78,7 @@ Les règles du code, du contenu et de Git. Le nouveau code doit ressembler à l�
 
 ## Git
 - Une branche par tâche, au nom court. Elle passe par sa version de test avant d’aller dans `main`.
+- Avant de fusionner une branche dans `main` : `npm run build`, puis `npm run verifier` (D50).
 - Un commit avant de demander une modification à Claude, puis un commit par étape qui fonctionne.
 - Des messages courts en français, qui décrivent le changement.
 - On relit le diff dans VS Code avant chaque commit.

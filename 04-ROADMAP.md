@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : phase 2, étape 2g (référencement de base).** La structure du site est fixée (D17 à D28), le modèle de données est en place (étape 2d), et les pages des mouvements, des artistes et des œuvres sont en ligne, avec le catalogue (étapes 2e et 2f). Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
+**Étape en cours : phase 2, étape 2h (finitions).** La structure du site est fixée (D17 à D28), le modèle de données est en place (étape 2d), les pages des mouvements, des artistes et des œuvres sont en ligne, avec le catalogue (étapes 2e et 2f), et le référencement de base est fait (étape 2g). Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
 
 ---
 
@@ -34,10 +34,14 @@ Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la
   3. **Catalogue.** Terminé le 8 novembre 2026. Le répertoire `/oeuvres/`, rangé par mouvement, en cartes avec vignette, avec une recherche par titre ou par artiste, un choix du mouvement et la case « Œuvres majeures seulement » (D47). L’entrée « Œuvres » dans le menu. Le filtre « Écrits et manifestes » est écarté.
 
   `src/lib/fiches.js` reste un seul fichier (D46). Testée sur la version de test, puis fusionnée dans `main`.
-- **2g · Référencement de base.** Titre de page, description (le résumé court du tableur), adresse canonique, sitemap.xml, robots.txt. Un contrôle des liens de `dist/` (outil à choisir à cette étape, sans dépendance si possible).
-- **2h · Finitions.** La page « À propos » et le plan du site (`/plan-du-site/`). L’Index reçoit les liens vers les nouvelles pages.
+- **2g · Référencement de base.** Terminé le 8 novembre 2026, sur la branche `referencement`, en quatre sous-étapes :
+  1. **Description.** `Base.astro` reçoit une `description` : le résumé court d’un mouvement ou d’une œuvre, la phrase-clé d’un artiste. La frise et les trois répertoires ont leur phrase, aux nombres et aux dates calculés. Les titres, déjà uniques, ne changent pas.
+  2. **Adresse canonique.** L’adresse du site est écrite une seule fois, dans `site` (D48) ; chaque page en déduit sa canonique, avec la barre finale, et la frise déclare `/` dans toutes ses vues.
+  3. **sitemap.xml et robots.txt**, fabriqués par Astro, sans dépendance (D49).
+  4. **Contrôle de `dist/`.** `verifier_dist.mjs`, lancé par `npm run verifier` : liens internes, ancres, concordance avec le sitemap (D50).
+- **2h · Finitions.** La page « À propos » et le plan du site (`/plan-du-site/`). L’Index reçoit les liens vers les nouvelles pages. Ajouter les deux pages à `PAGES_FIXES` (`src/pages/sitemap.xml.js`), et leur donner une description ; `npm run verifier` signale une page absente du sitemap.
 
-**Terminé quand** : chaque fiche rédigée a sa page ; aucun lien interne n’est cassé (construire.py, puis le contrôle de `dist/` à l’étape 2g) ; le sitemap est généré ; la frise fonctionne comme avant, sur ordinateur et sur téléphone.
+**Terminé quand** : chaque fiche rédigée a sa page ; aucun lien interne n’est cassé (construire.py, puis `npm run verifier`) ; le sitemap est généré ; la frise fonctionne comme avant, sur ordinateur et sur téléphone.
 
 ## En parallèle · Écriture
 L’écriture n’attend pas le code, et c’est elle qui fixe le rythme du site.
@@ -64,10 +68,10 @@ Phase dédiée, dans sa propre conversation, après la phase 2 et avant l’ouve
 
 ## Phase 3 · Nom de domaine et ouverture au public
 Le contenu minimum à l’ouverture est fixé par D26 : la frise, les mouvements, les artistes, le catalogue et les œuvres documentées, la recherche, sans la rubrique Comprendre.
-- Choisir le nom, acheter le .com et le brancher sur Cloudflare.
+- Choisir le nom, acheter le .com et le brancher sur Cloudflare. Remplacer l’adresse provisoire dans le champ `site` d’`astro.config.mjs` (D48), et dans le README.
 - Rédiger les mentions légales.
-- Ajouter une page 404, un favicon (à la place des logos d’Astro) et un aperçu pour le partage sur les réseaux (Open Graph).
-- Déclarer le site dans Google Search Console.
+- Ajouter une page 404, un favicon (à la place des logos d’Astro) et un aperçu pour le partage sur les réseaux (Open Graph). La page 404 n’a pas sa place dans le sitemap : l’exclure du contrôle de `verifier_dist.mjs`, qui la signalerait comme « page absente du sitemap ».
+- Déclarer le site et son sitemap dans Google Search Console.
 - À voir : un outil de mesure d’audience gratuit et sans cookies, pour suivre le nombre de fiches ouvertes chaque semaine.
 
 ## Phase 4 · Comprendre

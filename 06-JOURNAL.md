@@ -34,7 +34,7 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - `ONGLETS_INDEX` (titres des onglets de l’Index) est dans src/lib/outils.js parce que `compter()` en a besoin. À séparer si les pages ont un jour d’autres mots à compter.
 
 **Pages**
-- Le `<head>` est écrit deux fois, dans index.astro et dans src/layouts/Base.astro, jusqu’au lot 4 : un changement des polices ou du script du thème se fait dans les deux.
+- Le `<head>` est écrit deux fois, dans index.astro et dans src/layouts/Base.astro, jusqu’au lot 4 : un changement des polices, du script du thème, de la description ou de la canonique se fait dans les deux.
 - Le libellé « Lire la page ↗ » est écrit à trois endroits : `lirePage()` (src/lib/fiches.js), Ligne.astro et Carte.astro.
 - Le tri des œuvres par année est écrit à cinq endroits (pages mouvement, artiste et œuvre, catalogue, `listeOeuvres()`), et pas de la même façon : `listeOeuvres()` met une œuvre sans année en tête, les pages la mettent en fin de liste. Piste : une fonction `parAnnee` dans src/lib/outils.js.
 - La règle qui décide d’afficher une image (domaine public et fichier image) est écrite trois fois : `visuelOeuvre()` (src/lib/fiches.js), et `imageVisible` dans la page œuvre et dans le catalogue. Sans risque, puisque construire.py retire déjà les images des œuvres protégées. Piste : une fonction `imageAffichee()` dans fiches.js.
@@ -42,7 +42,7 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - L’encart d’une œuvre protégée a ses règles CSS en deux exemplaires, dans style.css et pages.css (D44) : voulu, l’affiche et le livre n’ont pas le même dessin, mais un changement de structure se fait dans les deux.
 - Les vignettes du catalogue et de « Du même artiste » sont presque toutes des aplats : une seule œuvre a une image. Le recadrage des images (`object-fit: cover`) reste à juger avec d’autres œuvres.
 - `textePage()` suppose que marked écrit chaque titre `##` en `<h2>` sans attribut, dans l’ordre du Markdown. Une ligne `## ` dans un bloc de code décalerait les ids du sommaire.
-- Les chapeaux des répertoires des mouvements et des œuvres sont écrits dans le code : ils ne suivent pas un changement du tableur.
+- Les chapeaux des répertoires des mouvements et des œuvres, et les descriptions de la frise et des trois répertoires, sont écrits dans le code : ils ne suivent pas un changement du tableur (seuls les nombres et les dates des descriptions sont calculés). Piste : un onglet « Pages » dans le tableur, quand ces textes seront plus nombreux (À propos, plan du site…).
 
 **Fiches et construire.py**
 - Un lien `[[id]]` vers un terme, un parcours ou une comparaison est signalé par construire.py (paramètre `ids_pas_encore_affiches` de `verifier_liens()`), car la frise afficherait l’identifiant brut. À retirer de cet avertissement en phase 4, quand ces éléments auront leur page.
@@ -59,6 +59,8 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 - Le lien vers un groupe dont le mouvement n’a pas de page (il ouvre alors la fiche du mouvement dans le panneau) n’a pas pu être testé : les 9 mouvements sont rédigés.
 - Panneau : les intertitres `###` sont maintenant plus petits que les `##`. Vérifier l’effet sur les fiches mouvements et artistes qui en utilisent.
 - La page œuvre n’a été testée qu’avec une fiche provisoire : à revoir avec la première vraie œuvre documentée, et une œuvre protégée avec un « Lien de l’œuvre ».
+- Sur Cloudflare, une adresse sans barre finale (`/mouvements/fauvisme`) doit mener à l’adresse avec barre, que déclare la canonique (D48). Pas encore vérifié explicitement.
+- Une page œuvre n’a pas encore été vue dans le sitemap : aucune œuvre n’est documentée.
 
 **Contenu**
 - « Nationalité … » suppose que la colonne « Nationalité » est au féminin. Rien ne signale une forme masculine.
@@ -69,6 +71,7 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 **Outils et documents**
 - Cloudflare, onglet « Previews Base » : la Build command et la Preview command sont saisies mais ignorées. Si Cloudflare se met à les appliquer, le site sera fabriqué plusieurs fois : sans danger, mais à nettoyer.
 - Avertissements Git « LF will be replaced by CRLF » (réglage `core.autocrlf` de Windows) : sans danger. Piste : un fichier `.gitattributes`.
+- `verifier_dist.mjs` ne tourne qu’à la main : rien ne rappelle de le lancer avant une fusion. Il lit le HTML par des expressions régulières, qui supposent des attributs entre guillemets doubles (D50).
 - Le README et ARCHITECTURE se recoupent (arborescence, déploiement). Principe proposé : le README reste un mode d’emploi, et le détail technique va dans ARCHITECTURE.
 - `npm install` signale que les scripts postinstall d’esbuild et de workerd (arrivés avec wrangler) ne sont pas couverts par `allowScripts` : ils ne sont pas lancés. Sans effet constaté, en local comme sur Cloudflare. À surveiller si une version de npm en fait une erreur.
 - Tableur : les listes déroulantes « De (ID) » et « Vers (ID) » de l’onglet Influences ne proposent que les artistes. Un identifiant de mouvement est accepté après un simple message, car Excel ne sait pas réunir deux onglets dans une même liste.
@@ -77,6 +80,12 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 ---
 
 # Entrées
+
+## 8 novembre 2026 · Étape 2g terminée : référencement de base
+**Fait** : sur la branche `referencement`, en quatre sous-étapes. Description : `Base.astro` reçoit `description`, le résumé court d’un mouvement ou d’une œuvre, la phrase-clé d’un artiste ; la frise et les trois répertoires ont leur phrase, dont les nombres et les dates sont calculés (les chapeaux, peu clairs hors contexte, ne sont pas repris). Adresse canonique : le champ `site` d’astro.config.mjs reçoit l’adresse provisoire en workers.dev, et chaque page déclare sa canonique, sur la production et avec la barre finale ; la frise déclare `/` dans toutes ses vues. sitemap.xml et robots.txt : deux endpoints statiques, sans dépendance, le sitemap suivant `aUnePage()`. Contrôle de `dist/` : `verifier_dist.mjs`, lancé par `npm run verifier`, testé avec un lien cassé exprès. Premier `npm run build` en local : l’ancien `dist/`, qui datait de l’étape 2c, est remplacé. Testé en local et sur la version de test.
+**Écarté** : `@astrojs/sitemap`, un robots.txt dans `public/`, un outil de liens tout fait, le contrôle à chaque déploiement, la date de modification dans le sitemap.
+**Reste à faire** : vérifier la barre finale sur la version de test et fusionner `referencement` dans `main`, si ce n’est fait ; puis l’étape 2h (À propos, plan du site, liens de l’Index), dans une nouvelle conversation.
+**Décisions prises** : D48, D49, D50.
 
 ## 8 novembre 2026 · Étape 2f terminée (sous-étape 3 : catalogue)
 **Fait** : sur la branche `oeuvres`, le catalogue `/oeuvres/`. Les œuvres sont rangées par mouvement, en cartes avec vignette : l’image d’une œuvre libre, un aplat hachuré « Œuvre protégée » ou un aplat uni « Image à venir ». Une recherche par titre ou par artiste, un choix du mouvement et la case « Œuvres majeures seulement », en amélioration progressive (D47). `Carte.astro` recopie sur son lien les attributs qu’on ne lui déclare pas (`data-…`) ; une carte avec vignette a un cadre égal, et la couleur du mouvement en trait sous l’image. « Œuvres » entre dans le menu, et le fil d’Ariane des pages œuvres ne mène plus à une erreur 404. Dans un répertoire filtré, le premier bloc visible n’a plus de marge en haut. Testé en local et sur la version de test ; branche `oeuvres` fusionnée dans `main`.

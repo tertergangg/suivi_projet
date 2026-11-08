@@ -4,7 +4,7 @@ Ce document décrit comment le site fonctionne (partie A) et ce qu’il doit dev
 
 ---
 
-# A. État actuel (novembre 2026, étape 2f terminée)
+# A. État actuel (novembre 2026, étape 2g terminée)
 
 ## Flux des données
 ```
@@ -12,16 +12,18 @@ donnees/frise_art_moderne_base.xlsx ─┐
                                      ├─> python construire.py ─> src/data/frise.json ─┐
 fiches/<dossier>/<id>.md ────────────┘                                                ├─> npm run build ─> dist/
 src/pages/ + src/layouts/ + src/components/ + src/scripts/app.js + src/lib/ + public/ ┘
+                                                                                  dist/ ─> npm run verifier
 ```
-Le site ne lit ni le tableur ni les fiches, seulement `frise.json`. Au build, Astro transforme chaque fichier de `src/pages/` en une ou plusieurs pages de `dist/` : `index.astro` donne `dist/index.html`, `mouvements/[id].astro` une page par mouvement rédigé, `oeuvres/[id].astro` une page par œuvre documentée, et `oeuvres/index.astro` le catalogue. Il intègre au script de la frise `frise.json`, `src/lib/` et marked, et publie ce script dans `dist/_astro/`, sous un nom qui change à chaque modification. Les pages, elles, sont fabriquées entièrement au build : leur HTML contient déjà tout leur texte. Il copie `public/` tel quel.
+Le site ne lit ni le tableur ni les fiches, seulement `frise.json`. Au build, Astro transforme chaque fichier de `src/pages/` en une ou plusieurs pages de `dist/` : `index.astro` donne `dist/index.html`, `mouvements/[id].astro` une page par mouvement rédigé, `oeuvres/[id].astro` une page par œuvre documentée, et `oeuvres/index.astro` le catalogue ; `sitemap.xml.js` et `robots.txt.js` donnent les fichiers du même nom. Il intègre au script de la frise `frise.json`, `src/lib/` et marked, et publie ce script dans `dist/_astro/`, sous un nom qui change à chaque modification. Les pages, elles, sont fabriquées entièrement au build : leur HTML contient déjà tout leur texte. Il copie `public/` tel quel.
 
 ## Arborescence
 ```
 README.md                mode d’emploi
 construire.py            tableur + fiches -> src/data/frise.json (Python, openpyxl), ≈ 570 lignes
-package.json             astro, marked (18.0.14, D30) ; wrangler en devDependencies (4.157.0, D16)
+package.json             astro, marked (18.0.14, D30) ; wrangler en devDependencies (4.157.0, D16) ; le script npm run verifier
 package-lock.json        FABRIQUÉ par npm : ne jamais le modifier à la main
-astro.config.mjs         réglages d’Astro (vide)
+astro.config.mjs         réglages d’Astro : l’adresse du site, site (D48)
+verifier_dist.mjs        contrôle des liens de dist/, lancé par npm run verifier (Node, sans dépendance, D50)
 wrangler.jsonc           réglages de Cloudflare : lance npm run build, publie ./dist
 .gitignore               node_modules/, dist/, .astro/
 suivi_projet/            les six documents du projet (D12), ignorés par Astro
@@ -37,6 +39,8 @@ src/
     mouvements/          index.astro (répertoire), [id].astro (une page par mouvement rédigé)
     artistes/            index.astro (répertoire et son filtre), [id].astro (une page par artiste rédigé)
     oeuvres/             index.astro (catalogue, sa recherche et ses filtres), [id].astro (une page par œuvre documentée)
+    sitemap.xml.js       la liste des pages, pour les moteurs de recherche (D49)
+    robots.txt.js        ce que les robots peuvent lire, et l’adresse du sitemap (D49)
   layouts/Base.astro     gabarit des pages : <head>, en-tête et menu du site, fil d’Ariane
   components/            morceaux communs aux pages : Ligne, Carte, EnteteFiche, Lecture
   scripts/app.js         fonctionnement de la frise, ≈ 755 lignes
@@ -120,7 +124,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - **Accessibilité**, à préserver : ARIA, focus visible, clavier, `prefers-reduced-motion`, `aria-live` du panneau coupé pendant l’Index.
 
 ## Les pages
-- **Gabarit** : chaque page passe par `src/layouts/Base.astro`. Il pose le `<head>` (une copie de celui d’index.astro jusqu’au lot 4), l’en-tête du site avec son menu et le fil d’Ariane. Le menu montre Frise, Mouvements, Artistes et Œuvres : Comprendre n’y entrera qu’avec son contenu (D18). Pas de bouton de thème avant le lot 4 : les pages suivent le choix fait sur la frise, ou le réglage de l’appareil.
+- **Gabarit** : chaque page passe par `src/layouts/Base.astro`. Il pose le `<head>` (une copie de celui d’index.astro jusqu’au lot 4, avec le titre, la description et l’adresse canonique), l’en-tête du site avec son menu et le fil d’Ariane. Le menu montre Frise, Mouvements, Artistes et Œuvres : Comprendre n’y entrera qu’avec son contenu (D18). Pas de bouton de thème avant le lot 4 : les pages suivent le choix fait sur la frise, ou le réglage de l’appareil.
 - **Fabrication** : tout est calculé au build, depuis `frise.json`. Une page dynamique (`[id].astro`) exporte `getStaticPaths()`, qui renvoie un objet par page à fabriquer ; seuls les éléments dont `aUnePage()` est vrai en reçoivent une (D13).
 - **Adresses** : `aUnePage()` et `adresse()` (src/lib/fiches.js) sont les seules à décider où mène un lien (D40). Les composants `Ligne` et `Carte` en déduisent leur adresse et leur flèche (« Lire la page » ou « Voir dans la frise »). Le texte des fiches passe par `textePage()`, qui appelle `markdown(md, true)` et donne un id à chaque titre `##`, pour le sommaire.
 - **Composants** (`src/components/`) :
@@ -135,6 +139,13 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - **Scripts**, en amélioration progressive : le filtre du répertoire des artistes (D42), la recherche et les filtres du catalogue (D47), et l’image en grand de la page œuvre, qui reprend le `<dialog>` `.visionneuse` de la frise.
 - « Voir dans la frise » mène à la vue mouvement (`/?mouvement=<id>`) depuis une page mouvement, et à `/#id` depuis une page artiste ou œuvre (D27).
 
+## Référencement
+- **Titre et description** : chaque page passe à `Base.astro` son titre et une phrase de description (`<meta name="description">`). Le résumé court du tableur pour un mouvement ou une œuvre, la phrase-clé pour un artiste ; une phrase écrite dans l’en-tête Astro, aux nombres et aux dates calculés, pour un répertoire. Sans phrase, pas de balise. La frise a la sienne dans index.astro.
+- **Adresse canonique** (D48) : `new URL(chemin, Astro.site)`, où `site` est l’adresse de production d’`astro.config.mjs`, et le chemin celui de la page, toujours avec la barre finale. La frise déclare `/` dans toutes ses vues.
+- **sitemap.xml** (D49) : `PAGES_FIXES` (la frise et les trois répertoires), puis les éléments dont `aUnePage()` est vrai, à l’adresse que donne `adresse()`. Les adresses sont complètes, sur la production.
+- **robots.txt** (D49) : tout est permis, et la dernière ligne donne l’adresse du sitemap.
+- **Contrôle de `dist/`** (D50) : `verifier_dist.mjs` lit chaque page HTML de `dist/` et signale un lien interne qui ne mène à aucun fichier, une ancre sans `id` correspondant (sauf vers la frise), une page absente du sitemap ou une adresse du sitemap sans page. Il ne voit pas les liens que la frise fabrique en JavaScript, que construire.py vérifie à la source.
+
 ## style.css et pages.css
 style.css est rangé par élément de la page, dans l’ordre où on les rencontre ; chaque section a son bloc `@media (max-width: 720px)`. Le bloc `prefers-reduced-motion` est en toute fin. Les couleurs et polices sont des variables sur `:root`, et le mode sombre est dans `:root[data-theme="dark"]`. Police Archivo (Google Fonts). La couleur des mouvements vient du tableur.
 
@@ -144,6 +155,7 @@ pages.css, la feuille des pages (D39), est chargée après style.css et rangée 
 À chaque push, Cloudflare installe les dépendances et lance `npx wrangler deploy`. Wrangler lit le bloc `build` de `wrangler.jsonc`, lance `npm run build` et publie `./dist`. La Build command de l’onglet Production du tableau de bord reste vide, sans quoi le site serait fabriqué deux fois.
 - `main` est la production. Les autres branches ont une version de test, publiée par `wrangler preview` (en bêta) grâce au bloc `"previews": {}`.
 - wrangler et marked sont en version exacte : on ne les met à jour que par choix, dans une branche testée.
+- Cloudflare ne lance pas `npm run verifier` : le contrôle de `dist/` se fait en local, avant la fusion dans `main` (D50).
 - GitHub Pages est désactivé (D11).
 
 ---
@@ -168,6 +180,7 @@ pages.css, la feuille des pages (D39), est chargée après style.css et rangée 
 /oeuvres/     /oeuvres/<id>/      catalogue filtrable, puis une page par œuvre documentée
 /comprendre/  parcours/<id>/  comparer/<id>/  glossaire/     phase 4
 /a-propos/  /plan-du-site/        dans le pied de page
+/sitemap.xml  /robots.txt         pour les moteurs de recherche (D49)
 /en/…                             phase 5
 ```
 Le menu : Frise, Mouvements, Artistes, Œuvres, Comprendre (dès la phase 4), puis « Rechercher » et le thème (D28). Les adresses sont rangées par type, jamais imbriquées (D18). Les événements n’ont pas de page.
@@ -205,6 +218,7 @@ src/
     artistes/index.astro    artistes/[id].astro
     oeuvres/index.astro     oeuvres/[id].astro
     a-propos.astro  plan-du-site.astro
+    sitemap.xml.js  robots.txt.js
     comprendre/…               phase 4
   scripts/app.js  lib/  data/frise.json     comme aujourd’hui
 ```
@@ -213,4 +227,5 @@ src/
 - **Avant les premières filiations** : le sens de De → Vers dans une relation « filiation » ou « réaction ».
 - **Lot 4** : le zoom affiché lors d’une première visite ; le découpage de la suite d’app.js, si besoin (D31) ; le filtre du répertoire des artistes (D42) et la recherche du catalogue (D47) face à « Rechercher ».
 - **Après la phase 2** : le panneau de la frise réduit à une fiche courte (D19).
+- **Phase 3** : le .com dans `site` (D48) ; la page 404, hors du sitemap et du contrôle de `dist/`.
 - **Phase 5** : l’organisation de `/en/…`, avant de commencer.
