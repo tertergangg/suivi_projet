@@ -11,9 +11,6 @@ Le détail des entrées jusqu’au 4 novembre 2026 est dans l’historique Git d
 Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 
 ## À régler pendant la phase 2
-- `src/lib/fiches.js` réunit la fabrique du panneau et des fonctions propres aux pages (`aUnePage`, `adresse`, `textePage`) ; l’étape 2e y a ajouté `lirePage()` et `destinationPanneau()`, l’étape 2f `encartDroits()` et `visuelOeuvre()`. À reconsidérer à la fin de l’étape 2f.
-- Sur la branche `oeuvres`, le lien « Œuvres » du fil d’Ariane des pages œuvres renvoie une erreur 404 jusqu’au catalogue (sous-étape 3).
-- Catalogue : construire.py met maintenant une majuscule à la technique. Le filtre « Écrits et manifestes » devra comparer « Texte », et non « texte ».
 - Le sens d’une relation « filiation » ou « réaction » n’est pas fixé : que veut dire De → Vers ? La page mouvement affiche donc le type de la relation sans son sens. À décider avant de saisir les premières filiations.
 - `NOMS_COURTS` (src/lib/outils.js) est une donnée rangée dans le code. Si deux artistes d’un même mouvement partagent un nom de famille, les listes de la fiche mouvement les confondront.
 - L’onglet « Influences » et la clé `influences` de frise.json contiennent maintenant toutes les relations (D23) : leur nom est trompeur. Un renommage toucherait le tableur, construire.py et src/lib/fiches.js.
@@ -39,12 +36,13 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 **Pages**
 - Le `<head>` est écrit deux fois, dans index.astro et dans src/layouts/Base.astro, jusqu’au lot 4 : un changement des polices ou du script du thème se fait dans les deux.
 - Le libellé « Lire la page ↗ » est écrit à trois endroits : `lirePage()` (src/lib/fiches.js), Ligne.astro et Carte.astro.
-- Le tri des œuvres par année est écrit à quatre endroits (pages mouvement, artiste et œuvre, `listeOeuvres()`), et pas de la même façon : `listeOeuvres()` met une œuvre sans année en tête, les pages la mettent en fin de liste.
+- Le tri des œuvres par année est écrit à cinq endroits (pages mouvement, artiste et œuvre, catalogue, `listeOeuvres()`), et pas de la même façon : `listeOeuvres()` met une œuvre sans année en tête, les pages la mettent en fin de liste. Piste : une fonction `parAnnee` dans src/lib/outils.js.
+- La règle qui décide d’afficher une image (domaine public et fichier image) est écrite trois fois : `visuelOeuvre()` (src/lib/fiches.js), et `imageVisible` dans la page œuvre et dans le catalogue. Sans risque, puisque construire.py retire déjà les images des œuvres protégées. Piste : une fonction `imageAffichee()` dans fiches.js.
+- Les répertoires des artistes et des œuvres ont chacun leur script de filtre, proches mais séparés.
 - L’encart d’une œuvre protégée a ses règles CSS en deux exemplaires, dans style.css et pages.css (D44) : voulu, l’affiche et le livre n’ont pas le même dessin, mais un changement de structure se fait dans les deux.
-- Les cartes « Du même artiste » montrent presque toutes l’aplat « Image à venir » : une seule œuvre a une image.
+- Les vignettes du catalogue et de « Du même artiste » sont presque toutes des aplats : une seule œuvre a une image. Le recadrage des images (`object-fit: cover`) reste à juger avec d’autres œuvres.
 - `textePage()` suppose que marked écrit chaque titre `##` en `<h2>` sans attribut, dans l’ordre du Markdown. Une ligne `## ` dans un bloc de code décalerait les ids du sommaire.
-- Répertoire des artistes : quand le filtre cache le premier mouvement, le suivant garde sa marge du haut.
-- Le chapeau du répertoire des mouvements (« Du premier Salon impressionniste… ») est écrit dans le code : il ne suit pas un changement du tableur.
+- Les chapeaux des répertoires des mouvements et des œuvres sont écrits dans le code : ils ne suivent pas un changement du tableur.
 
 **Fiches et construire.py**
 - Un lien `[[id]]` vers un terme, un parcours ou une comparaison est signalé par construire.py (paramètre `ids_pas_encore_affiches` de `verifier_liens()`), car la frise afficherait l’identifiant brut. À retirer de cet avertissement en phase 4, quand ces éléments auront leur page.
@@ -79,6 +77,12 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4.
 ---
 
 # Entrées
+
+## 8 novembre 2026 · Étape 2f terminée (sous-étape 3 : catalogue)
+**Fait** : sur la branche `oeuvres`, le catalogue `/oeuvres/`. Les œuvres sont rangées par mouvement, en cartes avec vignette : l’image d’une œuvre libre, un aplat hachuré « Œuvre protégée » ou un aplat uni « Image à venir ». Une recherche par titre ou par artiste, un choix du mouvement et la case « Œuvres majeures seulement », en amélioration progressive (D47). `Carte.astro` recopie sur son lien les attributs qu’on ne lui déclare pas (`data-…`) ; une carte avec vignette a un cadre égal, et la couleur du mouvement en trait sous l’image. « Œuvres » entre dans le menu, et le fil d’Ariane des pages œuvres ne mène plus à une erreur 404. Dans un répertoire filtré, le premier bloc visible n’a plus de marge en haut. Testé en local et sur la version de test ; branche `oeuvres` fusionnée dans `main`.
+**Écarté** : le filtre « Écrits et manifestes » (D47) ; le découpage de `src/lib/fiches.js` (D46) ; le rangement des doublons du tri par année et de la règle d’affichage des images, jugé non nécessaire.
+**Reste à faire** : l’étape 2g (référencement de base), dans une nouvelle conversation.
+**Décisions prises** : D46, D47 ; D20 précisée par D47.
 
 ## 7 novembre 2026 · Étape 2f, sous-étapes 1 et 2 : droits des images et page œuvre
 **Fait** : sur la branche `oeuvres`. Sous-étape 1 : D10 tranchée. construire.py calcule le domaine public (année de décès + 71, comparée à l’année du build), retire l’image d’une œuvre protégée et signale les écarts avec la colonne « Domaine public ? ». Le tableur reçoit, par son XML, les colonnes « Crédit image » et « Lien de l’œuvre » ; le Lisez-moi est mis à jour. Dans le panneau : encart des œuvres protégées, crédit sous l’image, sous-titre de l’œuvre agrandi, technique en majuscule, intertitres `###` sous les `##`. Sous-étape 2 : `aUnePage()` et `adresse()` apprennent les œuvres documentées ; une page par œuvre, en cartel (D45), avec l’image en grand dans un `<dialog>` et « Du même artiste » en cartes avec vignette. Testé en local avec une fiche provisoire, restaurée avant le commit. Branche non fusionnée.

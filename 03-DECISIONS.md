@@ -76,7 +76,7 @@ Alternatives écartées : des adresses imbriquées, qui obligeraient à choisir 
 Chaque partie du site répond à une seule question. La frise : quand, et qu’est-ce qui se passe en même temps ? La vue mouvement de la frise : qui, et dans quel ordre, au sein d’un mouvement ? Les pages : quoi, et pourquoi ? Comprendre : comment tout cela s’articule ? Rechercher : où est telle chose ?
 Un texte rédigé n’a qu’une page. Ailleurs, il apparaît en une phrase avec un lien. Les listes (œuvres d’un artiste, artistes d’un mouvement…) sont toujours calculées depuis le tableur, jamais écrites à la main. Pendant la phase 2, le panneau de la frise garde le texte complet de la fiche et reçoit un lien « Lire la page » : c’est de l’affichage en double, pas de l’écriture en double (D15). Son passage à une fiche courte sera décidé après la phase 2.
 
-**D20 · Comprendre : Parcours, Comparer, Glossaire** · Décidé (6 novembre 2026)
+**D20 · Comprendre : Parcours, Comparer, Glossaire** · Décidé (6 novembre 2026), précisé par D47
 La rubrique Comprendre (`/comprendre/`) a trois sous-rubriques : Parcours (`/comprendre/parcours/<id>/`), Comparer (`/comprendre/comparer/<id>/`) et Glossaire (`/comprendre/glossaire/`, une ancre par terme). Elle ne recopie aucune fiche : elle les relie. Les manifestes et écrits d’artistes restent des œuvres du tableur (type « texte ») : ils sont dans le catalogue des œuvres, avec un filtre « Écrits et manifestes », et dans les « Moments clés » de leur mouvement. Les comparaisons portent d’abord sur deux mouvements ; le format reste ouvert aux artistes et aux œuvres.
 Alternative écartée : une sous-rubrique « Textes », qui aurait créé une seconde fiche pour des œuvres existantes et serait devenue un fourre-tout.
 
@@ -126,7 +126,9 @@ Alternative écartée : découper app.js en huit modules (état, vues, frise, pa
 Les nouvelles lectures et vérifications de l’étape 2d s’ajoutent à construire.py, qui garde une fonction de lecture par onglet. Ces fonctions font déjà leurs propres vérifications : les séparer obligerait à faire circuler `avertir()` et les identifiants entre deux fichiers. C’est le même raisonnement que D31. À reconsidérer si le fichier devient difficile à lire.
 Alternative écartée : séparer la lecture et les vérifications en deux fichiers Python.
 
-**D33 Ignorer.
+**D33 · Les cartes de la frise restent placées à l’année, sans la date affichée** · Décidé (6 novembre 2026)
+Une carte est placée sur la frise à son année (colonne « Année ») et n’affiche pas la date affichée, qui reste dans sa fiche.
+Alternative écartée : afficher la date affichée sur les cartes de la frise.
 
 **D34 · Le titre « ## Analyse » marque l’analyse d’une fiche œuvre** · Décidé (6 novembre 2026)
 Dans une fiche œuvre, ce qui précède `## Analyse` est la présentation ; ce qui suit est l’analyse, dont les rubriques sont des titres `###`. construire.py en déduit le niveau de l’œuvre (D21), écrit dans la clé `niveau` de frise.json : `referencee` (fiche vide), `documentee` ou `analysee`. Une analyse sans vrai texte est retirée du Markdown, pour que son titre ne s’affiche pas seul. Ce titre ne se renomme plus une fois des fiches écrites.
@@ -179,3 +181,11 @@ Alternative écartée : un composant Astro avec ses propres classes, qui aurait 
 **D45 · La page œuvre est un cartel, sans sommaire** · Décidé (7 novembre 2026)
 La page œuvre n’utilise pas le composant `Lecture` : le texte d’une œuvre est court et se lit d’un trait. Sous l’en-tête (technique, date, « Œuvre majeure », titre, « Voir dans la frise »), une seule colonne : l’image et sa légende de cartel, ou l’encart des droits (D10), les rubriques Artiste, Mouvement et Où la voir entre deux filets, la présentation, l’analyse, puis « Du même artiste », en cartes avec une vignette. Un clic sur l’image l’ouvre en grand dans un `<dialog>`, en amélioration progressive. La composition s’inspire d’une maquette Lovable.
 Alternative écartée : les sections repliables de cette maquette, qui cachaient le texte derrière des clics.
+
+**D46 · src/lib/fiches.js reste un seul fichier** · Décidé (8 novembre 2026)
+Il réunit les adresses et le texte des fiches, partagés avec les pages (`aUnePage`, `adresse`, `lien`, `markdown`, `textePage`, `encartDroits`), et les fiches du panneau de la frise. Les séparer obligerait les secondes à importer les premiers, avec les risques écartés par D31 et D32, pour un fichier d’environ 210 lignes qui reste lisible. À reconsidérer s’il dépasse 300 lignes.
+Alternative écartée : trois modules, `adresses.js`, `texte.js` et `panneau.js` (D40 écartait déjà `adresses.js`).
+
+**D47 · Le catalogue a une recherche, un choix du mouvement et la case « Œuvres majeures »** · Décidé (8 novembre 2026), à revoir au lot 4
+Le catalogue `/oeuvres/` range les œuvres par mouvement, en cartes avec vignette. Son champ cherche dans le titre et le nom de l’artiste, sans tenir compte des accents ; une liste choisit le mouvement, une case garde les œuvres majeures. Le script est en amélioration progressive : sans JavaScript, la zone reste cachée et la page montre toutes les œuvres. Le filtre « Écrits et manifestes » prévu par D20 est écarté : il servait peu, et les écrits restent dans le catalogue, trouvables par la recherche, et dans les « Moments clés ». Comme le filtre des artistes (D42), cette recherche s’ajoute aux façons de chercher que D28 veut réunir : au lot 4, décider si elle reste à côté de « Rechercher ».
+Alternative écartée : les seuls filtres de la roadmap, sans recherche.

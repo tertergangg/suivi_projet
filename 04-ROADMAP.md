@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : phase 2, étape 2f, sous-étape 3 (catalogue `/oeuvres/`).** La structure du site est fixée (D17 à D28), le modèle de données est en place (étape 2d), et les pages des mouvements et des artistes sont en ligne (étape 2e). Dans l’étape 2f, D10 est tranchée et appliquée au panneau, et les œuvres documentées ont leur page, sur la branche `oeuvres`. Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
+**Étape en cours : phase 2, étape 2g (référencement de base).** La structure du site est fixée (D17 à D28), le modèle de données est en place (étape 2d), et les pages des mouvements, des artistes et des œuvres sont en ligne, avec le catalogue (étapes 2e et 2f). Viennent ensuite la fin de la phase 2, le lot 4 (téléphone et en-tête), puis la phase 3 (ouverture au public).
 
 ---
 
@@ -28,12 +28,12 @@ Objectif : la structure de D18, avec une page par fiche rédigée (D13, D21), la
   4. **Ponts.** « Lire la page » dans le panneau de la frise (D19). « Voir dans la frise » mène à la vue mouvement, à l’adresse `/?mouvement=<id>` (D27, D38, D43). Dans le panneau, un lien vers un groupe mène à la page de son mouvement, et construire.py cesse de le signaler.
 
   Testée sur la version de test, puis fusionnée dans `main`.
-- **2f · Catalogue et pages œuvres.** En cours, sur la branche `oeuvres`, en trois sous-étapes :
+- **2f · Catalogue et pages œuvres.** Terminé le 8 novembre 2026, sur la branche `oeuvres`, en trois sous-étapes :
   1. **Droits des images.** Terminé le 7 novembre 2026. D10 est tranchée : construire.py calcule le domaine public, retire les images des œuvres protégées et lit les nouvelles colonnes « Crédit image » et « Lien de l’œuvre ». Dans le panneau, une œuvre protégée affiche un encart à la place de l’image, et l’image d’une œuvre libre a son crédit. La technique prend une majuscule, le sous-titre de l’œuvre grandit, et les intertitres `###` du panneau passent sous les `##`.
   2. **Page œuvre.** Terminé le 7 novembre 2026. `aUnePage()` et `adresse()` apprennent les œuvres documentées. Chaque œuvre documentée a sa page, en cartel et sans sommaire (D45) : image en grand dans un `<dialog>`, encart des droits, « Du même artiste » en cartes avec vignette (`Carte.astro` reçoit l’option `vignette`). Testé avec une fiche provisoire, non commitée : aucune œuvre n’est encore documentée.
-  3. **Catalogue.** Le répertoire `/oeuvres/`, avec ses filtres (mouvement, œuvres majeures, « Écrits et manifestes »), et l’entrée « Œuvres » dans le menu. Le fil d’Ariane des pages œuvres y mène déjà.
+  3. **Catalogue.** Terminé le 8 novembre 2026. Le répertoire `/oeuvres/`, rangé par mouvement, en cartes avec vignette, avec une recherche par titre ou par artiste, un choix du mouvement et la case « Œuvres majeures seulement » (D47). L’entrée « Œuvres » dans le menu. Le filtre « Écrits et manifestes » est écarté.
 
-  La branche est testée sur la version de test, puis fusionnée dans `main`, une fois les trois sous-étapes terminées.
+  `src/lib/fiches.js` reste un seul fichier (D46). Testée sur la version de test, puis fusionnée dans `main`.
 - **2g · Référencement de base.** Titre de page, description (le résumé court du tableur), adresse canonique, sitemap.xml, robots.txt. Un contrôle des liens de `dist/` (outil à choisir à cette étape, sans dépendance si possible).
 - **2h · Finitions.** La page « À propos » et le plan du site (`/plan-du-site/`). L’Index reçoit les liens vers les nouvelles pages.
 
@@ -54,7 +54,7 @@ Phase dédiée, dans sa propre conversation, après la phase 2 et avant l’ouve
 - L’en-tête de la frise reçoit le menu du site (D18) et l’outil unique « Rechercher », qui réunit la recherche et l’Index (D28), dans un `<dialog>` pour la gestion du focus.
 - Revoir toute l’expérience sur petit écran, pages de la phase 2 comprises.
 - La frise passe au gabarit commun (`Base.astro`) : un seul `<head>`, et le bouton de thème sur tout le site. D’ici là, les pages suivent le thème choisi sur la frise, sans bouton.
-- Décider si le filtre du répertoire des artistes reste à côté de « Rechercher » (D42).
+- Décider si le filtre du répertoire des artistes (D42) et la recherche du catalogue (D47) restent à côté de « Rechercher ».
 - Pages : sur téléphone, le sommaire « Dans cette page » repousse le texte loin vers le bas ; un sommaire repliable réglerait ça. Les pages n’ont pas encore été vues sur téléphone.
 - À trancher : la frise doit-elle s’ouvrir sur le zoom Ensemble lors d’une première visite ?
 - Les règles téléphone ajoutées aux étapes 2a et 2b du lot 3 (libellé court « Au hasard », recherche sur toute la largeur, liste des résultats accrochée à gauche, bouton « Index » dans la même ligne) sont provisoires. La ligne des outils déborde sans doute.

@@ -4,7 +4,7 @@ Ce document décrit comment le site fonctionne (partie A) et ce qu’il doit dev
 
 ---
 
-# A. État actuel (novembre 2026, étape 2f en cours : sous-étapes 1 et 2 faites)
+# A. État actuel (novembre 2026, étape 2f terminée)
 
 ## Flux des données
 ```
@@ -13,7 +13,7 @@ donnees/frise_art_moderne_base.xlsx ─┐
 fiches/<dossier>/<id>.md ────────────┘                                                ├─> npm run build ─> dist/
 src/pages/ + src/layouts/ + src/components/ + src/scripts/app.js + src/lib/ + public/ ┘
 ```
-Le site ne lit ni le tableur ni les fiches, seulement `frise.json`. Au build, Astro transforme chaque fichier de `src/pages/` en une ou plusieurs pages de `dist/` : `index.astro` donne `dist/index.html`, `mouvements/[id].astro` une page par mouvement rédigé, et `oeuvres/[id].astro` une page par œuvre documentée. Il intègre au script de la frise `frise.json`, `src/lib/` et marked, et publie ce script dans `dist/_astro/`, sous un nom qui change à chaque modification. Les pages, elles, sont fabriquées entièrement au build : leur HTML contient déjà tout leur texte. Il copie `public/` tel quel.
+Le site ne lit ni le tableur ni les fiches, seulement `frise.json`. Au build, Astro transforme chaque fichier de `src/pages/` en une ou plusieurs pages de `dist/` : `index.astro` donne `dist/index.html`, `mouvements/[id].astro` une page par mouvement rédigé, `oeuvres/[id].astro` une page par œuvre documentée, et `oeuvres/index.astro` le catalogue. Il intègre au script de la frise `frise.json`, `src/lib/` et marked, et publie ce script dans `dist/_astro/`, sous un nom qui change à chaque modification. Les pages, elles, sont fabriquées entièrement au build : leur HTML contient déjà tout leur texte. Il copie `public/` tel quel.
 
 ## Arborescence
 ```
@@ -36,7 +36,7 @@ src/
     index.astro          structure de la page de la frise
     mouvements/          index.astro (répertoire), [id].astro (une page par mouvement rédigé)
     artistes/            index.astro (répertoire et son filtre), [id].astro (une page par artiste rédigé)
-    oeuvres/             [id].astro (une page par œuvre documentée) ; le catalogue index.astro arrive à la sous-étape 3 de la 2f
+    oeuvres/             index.astro (catalogue, sa recherche et ses filtres), [id].astro (une page par œuvre documentée)
   layouts/Base.astro     gabarit des pages : <head>, en-tête et menu du site, fil d’Ariane
   components/            morceaux communs aux pages : Ligne, Carte, EnteteFiche, Lecture
   scripts/app.js         fonctionnement de la frise, ≈ 755 lignes
@@ -45,7 +45,7 @@ src/
     outils.js            esc, sansAccent, nomCourt, compter, estImage…
     fiches.js            fiches du panneau (ficheOeuvre…, lirePage, encartDroits), et pour les pages : aUnePage, adresse, lien, markdown, textePage, encartDroits
   data/frise.json        FABRIQUÉ par construire.py, commité (D8)
-public/                  copié tel quel : style.css (≈ 510 lignes), pages.css (≈ 250 lignes), images/, favicons d’Astro (à remplacer en phase 3)
+public/                  copié tel quel : style.css (≈ 510 lignes), pages.css (≈ 280 lignes), images/, favicons d’Astro (à remplacer en phase 3)
 ```
 
 ## Le tableur
@@ -120,18 +120,19 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - **Accessibilité**, à préserver : ARIA, focus visible, clavier, `prefers-reduced-motion`, `aria-live` du panneau coupé pendant l’Index.
 
 ## Les pages
-- **Gabarit** : chaque page passe par `src/layouts/Base.astro`. Il pose le `<head>` (une copie de celui d’index.astro jusqu’au lot 4), l’en-tête du site avec son menu et le fil d’Ariane. Le menu ne montre que Frise, Mouvements et Artistes : une rubrique n’y entre qu’avec son contenu (D18), et Œuvres attend son catalogue. Pas de bouton de thème avant le lot 4 : les pages suivent le choix fait sur la frise, ou le réglage de l’appareil.
+- **Gabarit** : chaque page passe par `src/layouts/Base.astro`. Il pose le `<head>` (une copie de celui d’index.astro jusqu’au lot 4), l’en-tête du site avec son menu et le fil d’Ariane. Le menu montre Frise, Mouvements, Artistes et Œuvres : Comprendre n’y entrera qu’avec son contenu (D18). Pas de bouton de thème avant le lot 4 : les pages suivent le choix fait sur la frise, ou le réglage de l’appareil.
 - **Fabrication** : tout est calculé au build, depuis `frise.json`. Une page dynamique (`[id].astro`) exporte `getStaticPaths()`, qui renvoie un objet par page à fabriquer ; seuls les éléments dont `aUnePage()` est vrai en reçoivent une (D13).
 - **Adresses** : `aUnePage()` et `adresse()` (src/lib/fiches.js) sont les seules à décider où mène un lien (D40). Les composants `Ligne` et `Carte` en déduisent leur adresse et leur flèche (« Lire la page » ou « Voir dans la frise »). Le texte des fiches passe par `textePage()`, qui appelle `markdown(md, true)` et donne un id à chaque titre `##`, pour le sommaire.
 - **Composants** (`src/components/`) :
   - `Ligne` : une ligne de liste ;
-  - `Carte` : une œuvre, ou un mouvement dans son répertoire (D37), avec l’étoile des œuvres majeures, et une vignette facultative (l’image, ou un aplat « Œuvre protégée » ou « Image à venir ») ;
+  - `Carte` : une œuvre, ou un mouvement dans son répertoire (D37), avec l’étoile des œuvres majeures. Avec une vignette (catalogue, « Du même artiste ») : un cadre égal, l’image bord à bord ou un aplat (hachuré « Œuvre protégée », uni « Image à venir »), et la couleur du mouvement en trait sous l’image. Elle recopie sur son lien les attributs qu’on ne lui déclare pas (`data-…`) ;
   - `EnteteFiche` : la bande de couleur, le titre, « Voir dans la frise », et le repère chronologique d’un mouvement ;
   - `Lecture` : le sommaire « Dans cette page » et la colonne de texte.
 - **Page mouvement** : l’en-tête avec ses dates et son lieu, le repère, puis le texte, les groupes (une section et une ancre chacun), les artistes, les œuvres majeures en cartes, les autres œuvres en liste, les moments clés, les filiations et réactions.
 - **Page artiste** : l’en-tête sans chapeau (D41), les rubriques (Nationalité, Disciplines, Mouvement, Aussi, Groupes), le texte, les œuvres en cartes, les liens avec d’autres artistes et avec des mouvements.
 - **Page œuvre** (D45) : un cartel, sans le composant `Lecture` ni sommaire. L’en-tête (technique, date, « Œuvre majeure », titre), l’image et sa légende ou l’encart des droits (D10, D44), les rubriques Artiste, Mouvement et Où la voir, la présentation et l’analyse, puis « Du même artiste » en cartes avec vignette.
-- **Scripts**, en amélioration progressive : le filtre du répertoire des artistes (D42), et l’image en grand de la page œuvre, qui reprend le `<dialog>` `.visionneuse` de la frise.
+- **Catalogue** (D47) : les œuvres rangées par mouvement, en cartes avec vignette, avec une recherche par titre ou par artiste, sans tenir compte des accents, un choix du mouvement et la case « Œuvres majeures seulement ».
+- **Scripts**, en amélioration progressive : le filtre du répertoire des artistes (D42), la recherche et les filtres du catalogue (D47), et l’image en grand de la page œuvre, qui reprend le `<dialog>` `.visionneuse` de la frise.
 - « Voir dans la frise » mène à la vue mouvement (`/?mouvement=<id>`) depuis une page mouvement, et à `/#id` depuis une page artiste ou œuvre (D27).
 
 ## style.css et pages.css
@@ -210,7 +211,6 @@ src/
 
 ## À trancher, à l’étape indiquée
 - **Avant les premières filiations** : le sens de De → Vers dans une relation « filiation » ou « réaction ».
-- **2f** : le découpage de `src/lib/fiches.js`, à la fin de l’étape (il a reçu `encartDroits()` et `visuelOeuvre()`).
-- **Lot 4** : le zoom affiché lors d’une première visite ; le découpage de la suite d’app.js, si besoin (D31) ; le filtre du répertoire des artistes face à « Rechercher » (D42).
+- **Lot 4** : le zoom affiché lors d’une première visite ; le découpage de la suite d’app.js, si besoin (D31) ; le filtre du répertoire des artistes (D42) et la recherche du catalogue (D47) face à « Rechercher ».
 - **Après la phase 2** : le panneau de la frise réduit à une fiche courte (D19).
 - **Phase 5** : l’organisation de `/en/…`, avant de commencer.
