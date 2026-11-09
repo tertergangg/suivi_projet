@@ -25,15 +25,15 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4 ; les tâches
 - Une adresse `#id` qui reprend une propriété que tout objet JavaScript hérite (`#constructor`, `#toString`) fait planter `ouvrir()` : `OEU[id]` y trouve une fonction. Le démarrage vérifie `?mouvement=` avec `Object.hasOwn`, mais pas le `#id`. Correction d’une ligne, jugée inutile pour l’instant.
 - Le zoom « Intermédiaire » garde dans le code le nom de « Moyen » (`etat.moyen`, `data-niveau="moyen"`, `zoomMoyen()`, `pxParAnMoyen`, `largeurCarteMoyenne`) : voulu (D56), mais à garder en tête en lisant app.js.
 - Le décalage d’une fiche ouverte (3 ans au zoom Détail, dans `ouvrir()`) est un nombre écrit dans le code, alors que CONVENTIONS demande de nommer une valeur qu’on touche : à passer dans `REGLAGES`.
-- Thème : la clé `theme` et les valeurs `light`/`dark` sont écrites à trois endroits (le script du `<head>` d’index.astro, celui de Base.astro, et app.js). Après un clic, la bulle du bouton garde l’ancien libellé jusqu’au survol suivant.
+- Thème : la clé `theme` et les valeurs `light`/`dark` sont écrites à deux endroits, `ScriptTheme.astro` et `src/scripts/theme.js` (D57). Après un clic, la bulle du bouton de la frise garde l’ancien libellé jusqu’au survol suivant.
 - En-tête : la hauteur du bouton de thème (`2.25rem`) et le `margin-top` de la case « Œuvres majeures seulement » (`0.3rem`) sont calés à la main sur les boutons des mouvements.
 - style.css : `--trait` n’est utilisée nulle part.
 
 **Pages**
-- Le `<head>` est écrit deux fois, dans index.astro et dans src/layouts/Base.astro, jusqu’au lot 4 : un changement des polices, du script du thème, de la description ou de la canonique se fait dans les deux.
+- Le `<head>` est écrit deux fois, dans index.astro et dans src/layouts/Base.astro, jusqu’à l’étape 4e : un changement des polices, de la description ou de la canonique se fait dans les deux. Le script du thème, lui, est commun (`ScriptTheme.astro`).
 - Le libellé « Lire la page ↗ » est écrit à trois endroits : `lirePage()` (src/lib/fiches.js), Ligne.astro et Carte.astro.
 - Le tri des œuvres par année est écrit à six endroits (pages mouvement, artiste et œuvre, catalogue, plan du site, `listeOeuvres()`), et pas de la même façon : `listeOeuvres()` met une œuvre sans année en tête, les pages la mettent en fin de liste. Piste : une fonction `parAnnee` dans src/lib/outils.js.
-- Les pages fixes sont listées à cinq endroits : `MENU` et `PIED` (Base.astro), `PAGES_SITE` (app.js, Index de la frise, D51), `PAGES_FIXES` du plan du site (avec leurs libellés) et du sitemap (leurs adresses). `npm run verifier` rattrape un oubli dans le sitemap, pas ailleurs. Piste, au lot 4 : une seule liste dans src/lib/.
+- L’écart et la graisse d’À propos dans le menu (`.menu .a-part` de pages.css : 0,8 rem et 600) ont été choisis à l’œil, sans les valeurs de la maquette.
 - La règle qui décide d’afficher une image (domaine public et fichier image) est écrite trois fois : `visuelOeuvre()` (src/lib/fiches.js), et `imageVisible` dans la page œuvre et dans le catalogue. Sans risque, puisque construire.py retire déjà les images des œuvres protégées. Piste : une fonction `imageAffichee()` dans fiches.js.
 - Les répertoires des artistes et des œuvres ont chacun leur script de filtre, proches mais séparés.
 - L’encart d’une œuvre protégée a ses règles CSS en deux exemplaires, dans style.css et pages.css (D44) : voulu, l’affiche et le livre n’ont pas le même dessin, mais un changement de structure se fait dans les deux.
@@ -79,6 +79,12 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4 ; les tâches
 ---
 
 # Entrées
+
+## 9 novembre 2026 · Étape 4b terminée : en-tête commun
+**Fait** : sur la branche `entete-commun`, en trois sous-étapes. Sous-étape 1 : les pages fixes sont écrites une seule fois, dans `src/lib/site.js` ; le menu, le pied de page, l’Index, le plan du site et le sitemap en dérivent, sans changement visible. Sous-étape 2 : le thème est partagé par `ScriptTheme.astro` (le script du `<head>`) et `BoutonTheme.astro` (le bouton et `src/scripts/theme.js`) ; app.js perd sa section « Thème », et les pages reçoivent le bouton, au bout de leur en-tête. Une suppression incomplète de cette section a cassé la frise (`boutonTheme is not defined`) : corrigée en remplaçant app.js en entier, puis contrôlée par le diff. Sous-étape 3 : l’en-tête des pages devient `EnteteSite.astro`, et À propos entre dans le menu, à l’écart (D55). `npm run verifier` : aucun lien cassé. Testé en local et sur la version de test ; fusionné dans `main`.
+**Écarté** : un onglet « Pages » dans le tableur, `define:vars` pour écrire la clé du thème une seule fois, une seconde `<nav>` pour À propos, « Au hasard » et l’Index sur les pages dès cette étape.
+**Reste à faire** : l’étape 4c (Index unifié), dans une nouvelle conversation.
+**Décisions prises** : D57.
 
 ## 9 novembre 2026 · Lot 4 : en-tête décidé, découpage, étape 4a terminée
 **Fait** : tri des changements d’en-tête voulus par Térence, avec une maquette cliquable (ordinateur et téléphone, vraies couleurs), publiée sur claude.ai et gardée hors du dépôt. En-tête décidé : deux lignes, l’Index garde son nom et son panneau, À propos entre dans le menu, les mouvements restent des boutons encadrés mais tiennent sur une ligne, l’étoile « Œuvres majeures » passe dans la barre du bas. Les largeurs ont été mesurées avec Archivo. Le lot est découpé en étapes 4a à 4f (ROADMAP). Étape 4a, sur la branche `zoom-intermediaire` : la frise s’ouvre au zoom « Intermédiaire », nouveau nom de « Moyen » (libellé seul), et une fiche ouverte est placée en pixels, sans changement en Détail. Testé en local et sur la version de test, téléphone compris (la barre du bas tient) ; fusionné dans `main`.
