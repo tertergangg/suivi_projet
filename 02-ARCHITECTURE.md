@@ -4,7 +4,7 @@ Ce document décrit comment le site fonctionne (partie A) et ce qu’il doit dev
 
 ---
 
-# A. État actuel (novembre 2026, phase 2 terminée)
+# A. État actuel (novembre 2026, lot 4 en cours, étape 4d terminée)
 
 ## Flux des données
 ```
@@ -44,9 +44,9 @@ src/
     sitemap.xml.js       la liste des pages, pour les moteurs de recherche (D49)
     robots.txt.js        ce que les robots peuvent lire, et l’adresse du sitemap (D49)
   layouts/Base.astro     gabarit des pages : <head>, en-tête (EnteteSite), fil d’Ariane, pied de page
-  components/            morceaux communs aux pages : Ligne, Carte, EnteteFiche, Lecture, EnteteSite ;
-                         et, aussi sur la frise, ScriptTheme et BoutonTheme (D57)
-  scripts/app.js         fonctionnement de la frise, ≈ 755 lignes
+  components/            morceaux communs aux pages : Ligne, Carte, EnteteFiche, Lecture ;
+                         et, aussi sur la frise, EnteteSite, ScriptTheme et BoutonTheme (D57, D59)
+  scripts/app.js         fonctionnement de la frise, ≈ 780 lignes
   scripts/theme.js       le bouton de thème, chargé par BoutonTheme (D57)
   lib/                   partagé par la frise et les pages (D31)
     donnees.js           importe frise.json ; MOUV, ART, OEU, EVT, GRP, couleur, mouvementsTries
@@ -54,7 +54,7 @@ src/
     fiches.js            fiches du panneau (ficheOeuvre…, lirePage, encartDroits), et pour les pages : aUnePage, adresse, lien, markdown, textePage, encartDroits
     site.js              PAGES_FIXES, la seule liste des pages fixes (D57)
   data/frise.json        FABRIQUÉ par construire.py, commité (D8)
-public/                  copié tel quel : style.css (≈ 520 lignes), pages.css (≈ 305 lignes), images/, favicons d’Astro (à remplacer en phase 3)
+public/                  copié tel quel : style.css (≈ 535 lignes), pages.css (≈ 285 lignes), images/, favicons d’Astro (à remplacer en phase 3)
 ```
 
 ## Le tableur
@@ -111,7 +111,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 `fiche` contient le Markdown, ou une chaîne vide si la fiche est vide. Les listes (`autres`, `groupes`, `voirAussi`, `etapes`, `elements`) contiennent des identifiants. Une valeur inconnue est signalée ; `autres` et `voirAussi` la gardent, `groupes` l’écarte. La frise ne lit les groupes que pour les liens `[[groupe]]` ; elle n’utilise ni la clé `groupes` des artistes, ni `glossaire`, ni `parcours`, ni `comparaisons`, et n’affiche que les relations entre deux artistes. `niveau` décide, par `aUnePage()`, si une œuvre a sa page. Les pages utilisent `groupes` et toutes les relations ; `glossaire`, `parcours` et `comparaisons` attendent la phase 4.
 
 ## La frise
-- **index.astro** : la structure fixe de la page (script du thème dans le `<head>`, par `ScriptTheme`, en-tête avec le bouton `BoutonTheme`, bandeau, zone qui défile, barre du bas, bulle, panneau, `<dialog>` de l’image) et son script, `src/scripts/app.js`, qu’Astro traite comme un module.
+- **index.astro** : la structure fixe de la page (script du thème dans le `<head>`, par `ScriptTheme`, un `<h1>` caché, l’en-tête commun `EnteteSite` et sa seconde ligne, les mouvements et l’étoile « Œuvres majeures » (D59, D60), bandeau, zone qui défile, barre du bas, bulle, panneau, `<dialog>` de l’image) et son script, `src/scripts/app.js`, qu’Astro traite comme un module.
 - **src/lib/** fabrique ce qui sert aussi aux pages : données, outils, contenu des fiches. Rien n’y touche à `document` ni à `window`, pour que ces fichiers fonctionnent au build.
 - **app.js** fait tout le reste :
   - `REGLAGES`, en tête du fichier, réunit les réglages modifiables ;
@@ -123,7 +123,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 
   Le zoom « Intermédiaire » est la vue détail resserrée, et le zoom d’ouverture de la frise ; il s’appelle `moyen` dans le code (D56).
 - **Adresse** : elle suit l’affichage, par `history.replaceState`, sans ajouter d’étape à l’historique (D43). `changerVue()` tient à jour `?mouvement=<id>`, et `ouvrir()` le `#id` de la fiche ouverte ; les deux se combinent (`/?mouvement=fauvisme#matisse`). Au démarrage, la vue est affichée d’abord, la fiche ensuite ; un `?mouvement=` inconnu est retiré de l’adresse.
-- **Navigation** : glisser, flèches du clavier, barre du bas (zooms et repères), sommaire des mouvements, recherche insensible aux accents, « Une œuvre au hasard ».
+- **Navigation** : glisser, flèches du clavier, barre du bas (zooms et repères), menu du site, ligne des mouvements, « Une œuvre au hasard », et l’Index, seule recherche de la frise (D53). L’étoile « Œuvres majeures », au bout de la ligne des mouvements, inverse `etat.majeures` (D60).
 - **Panneau** : il affiche une fiche ou l’Index. L’Index s’ouvre aussi à l’adresse `/#index` ; il cherche dans l’onglet ouvert, par le nom et par les noms liés (D58), et finit par À propos et le plan du site (D55). Les liens `[[id]]` deviennent des liens `#id`, qui ouvrent la fiche sur place ; un lien vers un groupe mène à la page de son mouvement (`destinationPanneau()`). Une fiche qui a sa page affiche « Lire la page » (D19), un vrai lien que le panneau n’intercepte pas. Une fiche d’œuvre commence par son image et son crédit, ou par l’encart d’une œuvre protégée (`encartDroits()`, D10).
 - **Thème** : `data-theme` sur `<html>`, mémorisé dans `localStorage` (clé `theme`). Le script du `<head>` (`ScriptTheme`) le pose avant l’affichage, le bouton (`BoutonTheme`, `src/scripts/theme.js`) l’inverse ; les deux sont communs à la frise et aux pages (D57).
 - **Accessibilité**, à préserver : ARIA, focus visible, clavier, `prefers-reduced-motion`, `aria-live` du panneau coupé pendant l’Index.
@@ -137,7 +137,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
   - `Carte` : une œuvre, ou un mouvement dans son répertoire (D37), avec l’étoile des œuvres majeures. Avec une vignette (catalogue, « Du même artiste ») : un cadre égal, l’image bord à bord ou un aplat (hachuré « Œuvre protégée », uni « Image à venir »), et la couleur du mouvement en trait sous l’image. Elle recopie sur son lien les attributs qu’on ne lui déclare pas (`data-…`) ;
   - `EnteteFiche` : la bande de couleur, le titre, « Voir dans la frise », et le repère chronologique d’un mouvement ;
   - `Lecture` : le sommaire « Dans cette page » et la colonne de texte ;
-  - `EnteteSite` : l’en-tête des pages (le titre, le menu, le bouton de thème), qui reçoit la rubrique et le chemin de la page ;
+  - `EnteteSite` : l’en-tête du site, sur les pages et la frise (D59) : le titre, le menu, « Au hasard », l’Index et le bouton de thème. Il reçoit la rubrique et le chemin de la page ; sur la frise, `surFrise`, qui fait de « Au hasard » et de l’Index des boutons, et la ligne des mouvements par son `<slot />` ;
   - `ScriptTheme` et `BoutonTheme` : le script du thème et son bouton, aussi sur la frise (D57).
 - **Page mouvement** : l’en-tête avec ses dates et son lieu, le repère, puis le texte, les groupes (une section et une ancre chacun), les artistes, les œuvres majeures en cartes, les autres œuvres en liste, les moments clés, les filiations et réactions.
 - **Page artiste** : l’en-tête sans chapeau (D41), les rubriques (Nationalité, Disciplines, Mouvement, Aussi, Groupes), le texte, les œuvres en cartes, les liens avec d’autres artistes et avec des mouvements.
@@ -155,7 +155,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - **Contrôle de `dist/`** (D50) : `verifier_dist.mjs` lit chaque page HTML de `dist/` et signale un lien interne qui ne mène à aucun fichier, une ancre sans `id` correspondant (sauf vers la frise), une page absente du sitemap ou une adresse du sitemap sans page. Il ne voit pas les liens que la frise fabrique en JavaScript, que construire.py vérifie à la source.
 
 ## style.css et pages.css
-style.css est rangé par élément de la page, dans l’ordre où on les rencontre ; chaque section a son bloc `@media (max-width: 720px)`. Le bloc `prefers-reduced-motion` est en toute fin. Les couleurs et polices sont des variables sur `:root`, et le mode sombre est dans `:root[data-theme="dark"]`. Police Archivo (Google Fonts). La couleur des mouvements vient du tableur.
+style.css est rangé par élément de la page, dans l’ordre où on les rencontre ; chaque section a son bloc `@media (max-width: 720px)`. Le bloc `prefers-reduced-motion` est en toute fin. Les couleurs et polices sont des variables sur `:root`, et le mode sombre est dans `:root[data-theme="dark"]`. Police Archivo (Google Fonts). La couleur des mouvements vient du tableur. L’en-tête du site, commun à la frise et aux pages, a toutes ses règles dans style.css (D59).
 
 pages.css, la feuille des pages (D39), est chargée après style.css et rangée de la même façon. Elle en reprend les variables, donc le mode sombre, et annule par `body.page` la mise en page de la frise. Ses classes ne reprennent jamais un nom de style.css, sauf pour un élément commun à la frise et aux pages (D44) : l’encart des droits, rangé sous `.texte`, et la fenêtre d’image, utilisée telle quelle.
 
@@ -206,7 +206,7 @@ Le menu : Frise, Mouvements, Artistes, Œuvres, Comprendre (dès la phase 4), pu
 
 ## Ce qui reste à construire
 Les gabarits des mouvements, des artistes, des œuvres, des répertoires et des pages fixes sont en place (partie A). Restent :
-- au lot 4, un en-tête commun, l’Index unifié dans le panneau et le nouvel en-tête de la frise (D53 à D55), puis la frise dans `Base.astro`, avec un seul `<head>` ; la frise n’a pas de pied de page, ses liens sont dans l’Index et le ☰ ;
+- au lot 4, la frise dans `Base.astro`, avec un seul `<head>` (la frise n’a pas de pied de page : ses liens sont dans l’Index et le ☰), puis le ☰ et la version téléphone ;
 - en phase 3, la page 404 (`src/pages/404.astro`), hors du sitemap et du contrôle de `dist/` ;
 - en phase 4, `src/pages/comprendre/` : l’accueil de la rubrique, le gabarit Article (parcours, comparaison) et le glossaire.
 

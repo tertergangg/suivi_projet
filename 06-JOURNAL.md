@@ -27,14 +27,16 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4 ; les tâches
 - Le zoom « Intermédiaire » garde dans le code le nom de « Moyen » (`etat.moyen`, `data-niveau="moyen"`, `zoomMoyen()`, `pxParAnMoyen`, `largeurCarteMoyenne`) : voulu (D56), mais à garder en tête en lisant app.js.
 - Le décalage d’une fiche ouverte (3 ans au zoom Détail, dans `ouvrir()`) est un nombre écrit dans le code, alors que CONVENTIONS demande de nommer une valeur qu’on touche : à passer dans `REGLAGES`.
 - Thème : la clé `theme` et les valeurs `light`/`dark` sont écrites à deux endroits, `ScriptTheme.astro` et `src/scripts/theme.js` (D57). Après un clic, la bulle du bouton de la frise garde l’ancien libellé jusqu’au survol suivant.
-- En-tête : la hauteur du bouton de thème (`2.25rem`) et le `margin-top` de la case « Œuvres majeures seulement » (`0.3rem`) sont calés à la main sur les boutons des mouvements.
+- Ligne des mouvements : le seuil de 1 220 px, où le texte passe à 0,84 rem, vient de la maquette et n’a pas été mesuré sur le site. Sous la largeur où elle tient (vers 1 300 px depuis l’ajout de l’étoile), elle défile sans barre visible : à la souris, ça ne se devine pas.
+- L’étoile « Œuvres majeures », survolée, devient noire comme si elle était enfoncée : on ne voit son état qu’en sortant la souris. Les onglets de l’Index font de même.
+- Les ids `hasard` et `ouvrir-index` sont écrits dans `EnteteSite.astro` et lus par app.js (`$("#hasard")`) : un renommage se fait aux deux endroits.
 - style.css : `--trait` n’est utilisée nulle part.
 
 **Pages**
 - Le `<head>` est écrit deux fois, dans index.astro et dans src/layouts/Base.astro, jusqu’à l’étape 4e : un changement des polices, de la description ou de la canonique se fait dans les deux. Le script du thème, lui, est commun (`ScriptTheme.astro`).
 - Le libellé « Lire la page ↗ » est écrit à trois endroits : `lirePage()` (src/lib/fiches.js), Ligne.astro et Carte.astro.
 - Le tri des œuvres par année est écrit à six endroits (pages mouvement, artiste et œuvre, catalogue, plan du site, `listeOeuvres()`), et pas de la même façon : `listeOeuvres()` met une œuvre sans année en tête, les pages la mettent en fin de liste. Piste : une fonction `parAnnee` dans src/lib/outils.js.
-- L’écart et la graisse d’À propos dans le menu (`.menu .a-part` de pages.css : 0,8 rem et 600) ont été choisis à l’œil, sans les valeurs de la maquette.
+- L’écart et la graisse d’À propos dans le menu (`.menu .a-part` de style.css : 0,8 rem et 600) ont été choisis à l’œil, sans les valeurs de la maquette.
 - La règle qui décide d’afficher une image (domaine public et fichier image) est écrite trois fois : `visuelOeuvre()` (src/lib/fiches.js), et `imageVisible` dans la page œuvre et dans le catalogue. Sans risque, puisque construire.py retire déjà les images des œuvres protégées. Piste : une fonction `imageAffichee()` dans fiches.js.
 - Les répertoires des artistes et des œuvres ont chacun leur script de filtre, proches mais séparés.
 - L’encart d’une œuvre protégée a ses règles CSS en deux exemplaires, dans style.css et pages.css (D44) : voulu, l’affiche et le livre n’ont pas le même dessin, mais un changement de structure se fait dans les deux.
@@ -80,6 +82,12 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4 ; les tâches
 ---
 
 # Entrées
+
+## 9 novembre 2026 · Étape 4d terminée : nouvel en-tête de la frise
+**Fait** : sur la branche `entete-frise`, en une seule livraison plutôt qu’en quatre sous-étapes. La frise prend `EnteteSite.astro` : la propriété `surFrise` y fait de « Au hasard » et de l’Index des boutons, et la ligne des mouvements arrive par le `<slot />` ; un `<h1>` caché remplace le grand titre. Les règles de l’en-tête passent de pages.css à style.css. Le champ de recherche de l’en-tête et son code quittent app.js, et Index reçoit sa loupe. Les mouvements, resserrés, tiennent sur une ligne ; celui de la vue mouvement reste rempli de sa couleur (`aria-current`). Après essai, l’étoile « Œuvres majeures », d’abord placée dans la barre du bas, passe au bout de la ligne des mouvements, et les trois boutons de droite reçoivent la même hauteur et la même ombre. `npm run verifier` : aucun lien cassé. Testé en local et sur la version de test ; fusionné dans `main`.
+**Écarté** : charger pages.css sur la frise, un fichier `entete.css`, des liens `/#index` interceptés par app.js, l’étoile sur la ligne 1.
+**Reste à faire** : l’étape 4e (la frise dans `Base.astro`), dans une nouvelle conversation. Les défauts relevés sur téléphone attendent l’étape 4f.
+**Décisions prises** : D59, D60 ; D54 modifiée par D60.
 
 ## 9 novembre 2026 · Étape 4c terminée : Index unifié
 **Fait** : sur la branche `index-unifie`, en quatre sous-étapes. Sous-étape 1 : l’Index garde ses onglets, et chaque ligne se cherche aussi par les noms qui lui sont liés (un artiste par son mouvement principal, une œuvre par son artiste et son mouvement) ; Entrée ouvre le premier résultat. Sous-étape 2 : à la fermeture du panneau, le focus revient à l’élément qui l’a ouvert, ou à la frise si cet élément a disparu. Sous-étape 3 : les adresses `/#index` et `/#hasard`, écrites une fois dans `ANCRES_FRISE` (`src/lib/site.js`) ; À propos et le plan du site au bas de l’Index ; retrait de la ligne « Pages du site » et de `PAGES_SITE`. Sous-étape 4 : « Au hasard » et Index dans l’en-tête des pages, comme liens vers la frise ; sur téléphone, ils passent sous le titre. Testé en local puis mergé dans main.

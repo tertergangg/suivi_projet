@@ -24,7 +24,7 @@ Les règles du code, du contenu et de Git. Le nouveau code doit ressembler à l�
   - `--grille-bande` ;
   - le voile de l’image en grand (`::backdrop` ne voit pas toujours les variables).
 - Pas de style écrit en dur dans les gabarits Astro. Dans app.js comme dans les gabarits, l’attribut `style` ne sert qu’aux valeurs calculées : positions, largeurs, couleur du mouvement (`--c`).
-- Les règles de la frise vont dans `public/style.css`, celles des pages dans `public/pages.css` (D39). pages.css est chargé après style.css : une classe des pages ne reprend jamais un nom de style.css (`.carte`, `.entete`, `.bande`, `.resume`…). Seule exception, un élément commun à la frise et aux pages (D44) : il garde ses classes, rangées sous `.fiche` dans style.css et sous `.texte` dans pages.css.
+- Les règles de la frise vont dans `public/style.css`, celles des pages dans `public/pages.css` (D39). pages.css est chargé après style.css : une classe des pages ne reprend jamais un nom de style.css (`.carte`, `.filtre`, `.bande`, `.resume`…). Exceptions : un élément commun à la frise et aux pages (D44) garde ses classes, rangées sous `.fiche` dans style.css et sous `.texte` dans pages.css ; l’en-tête du site, commun lui aussi, a toutes ses règles dans style.css (D59).
 - Une nouvelle règle va dans la section de son élément, et sa version téléphone dans le bloc `@media (max-width: 720px)` de cette section.
 - On garde le focus visible et le respect de `prefers-reduced-motion`.
 - La frise est l’affiche, les pages sont le livre (D25) :

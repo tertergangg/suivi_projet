@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : lot 4, étape 4d (nouvel en-tête de la frise).** Les étapes 4a à 4c sont terminées. La phase 2 est terminée : chaque fiche rédigée a sa page, avec le catalogue, le référencement de base, À propos et le plan du site. Viennent ensuite la phase 3 (ouverture au public), puis la rubrique Comprendre (phase 4).
+**Étape en cours : lot 4, étape 4e (la frise dans `Base.astro`).** Les étapes 4a à 4d sont terminées. La phase 2 est terminée : chaque fiche rédigée a sa page, avec le catalogue, le référencement de base, À propos et le plan du site. Viennent ensuite la phase 3 (ouverture au public), puis la rubrique Comprendre (phase 4).
 
 ---
 
@@ -27,20 +27,18 @@ Phase dédiée, avant l’ouverture au public. Une branche par étape, testée s
 - **4a · Zoom d’ouverture** · terminé le 9 novembre 2026. La frise s’ouvre sur « Intermédiaire », nouveau nom de « Moyen », et une fiche ouverte est placée en pixels (D56).
 - **4b · En-tête commun** · terminé le 9 novembre 2026. Une seule liste des pages fixes (`src/lib/site.js`), le thème partagé par deux composants et le bouton de thème sur les pages, l’en-tête des pages dans `EnteteSite.astro`, avec À propos dans le menu (D57).
 - **4c · Index unifié** · terminé le 9 novembre 2026. Recherche par onglet élargie aux noms liés, focus rendu à la fermeture, adresses `/#index` et `/#hasard`, À propos et plan du site au bas de l’Index, « Au hasard » et Index dans l’en-tête des pages (D58).
-- **4d · Nouvel en-tête de la frise** (D54, D55) : le menu avec À propos, les mouvements resserrés sur une ligne, le bouton Index avec sa loupe, l’étoile « Œuvres majeures » dans la barre du bas ; retrait du champ de recherche de l’en-tête et de son code dans app.js (`index`, `trouves`, `choisir()`). La frise prend `EnteteSite.astro` : ses règles sont dans pages.css, à déplacer dans style.css ou à charger sur la frise, à décider au plan de l’étape.
-- **4e · La frise dans `Base.astro`** : un seul `<head>`, le bouton de thème sur tout le site. La frise n’a pas de pied de page : ses liens sont dans l’Index et dans le ☰ (D55).
-- **4f et suite · Téléphone** : le ☰ (rubriques, À propos, plan du site, thème), puis les points ci-dessous.
+- **4d · Nouvel en-tête de la frise** · terminé le 9 novembre 2026. La frise prend `EnteteSite.astro`, dont les règles passent dans style.css (D59) ; l’ancien champ de recherche est retiré ; l’Index a sa loupe ; les mouvements tiennent sur une ligne, suivis de l’étoile « Œuvres majeures », et les trois boutons de droite ont la même ombre (D60).
+- **4e · La frise dans `Base.astro`** : un seul `<head>`, le bouton de thème sur tout le site. La frise n’a pas de pied de page : ses liens sont dans l’Index et dans le ☰ (D55). `Base.astro` charge pages.css et pose `body.page`, que la frise ne doit pas recevoir : à régler au plan de l’étape.
+- **4f et suite · Téléphone** : le ☰ (rubriques, À propos, plan du site, thème), puis les points ci-dessous. Térence a relevé de nombreux défauts sur téléphone à la fin de l’étape 4d : les lister au début de l’étape.
 
 Points à traiter au fil de ces étapes :
 - Revoir toute l’expérience sur petit écran, pages de la phase 2 comprises.
 - Décider si le filtre du répertoire des artistes (D42) et la recherche du catalogue (D47) restent à côté de l’Index.
 - Pages : sur téléphone, le sommaire « Dans cette page » repousse le texte loin vers le bas ; un sommaire repliable réglerait ça. À propos et le plan du site ont été vus sur téléphone ; les pages des mouvements, des artistes et des œuvres, pas encore en détail.
-- Les règles téléphone ajoutées aux étapes 2a et 2b du lot 3 (libellé court « Au hasard », recherche sur toute la largeur, liste des résultats accrochée à gauche, bouton « Index » dans la même ligne) sont provisoires : l’étape 4d les remplace.
-- En-tête des pages, sur téléphone : « Au hasard », l’Index et le thème passent sous le titre, sur leur propre ligne (étape 4c). Provisoire : le ☰ les réorganise à l’étape 4f.
+- En-tête, sur téléphone, sur la frise comme sur les pages : quatre rangées, le titre, puis « Au hasard », l’Index et le thème, puis le menu qui défile (`order: 1`), puis, sur la frise, les mouvements qui défilent et l’étoile « ★ Majeures ». Provisoire : le ☰ les réorganise à l’étape 4f.
 - Étiquettes d’artistes de la vue mouvement : sur téléphone, les compléments (nombre d’œuvres, nationalité, disciplines, « Surtout ») sont cachés (classe `.complement`). À revoir si l’étiquette s’élargit.
-- Barre du bas : serrée sur téléphone (libellés à 0,75 rem). « Intermédiaire » y tient (test de l’étape 4a), mais l’étoile « Œuvres majeures » s’y ajoutera à l’étape 4d.
-- Pages, sur téléphone : le bouton de thème reste sur la ligne du titre et le menu passe dessous (`order: 1` dans pages.css), avec À propos au bout du menu qui défile. Provisoire : le ☰ les remplace à l’étape 4f.
-- À voir : découper la suite d’app.js (D31) si l’ajout du menu et de l’Index unifié le rend difficile à lire.
+- Barre du bas : serrée sur téléphone (libellés à 0,75 rem). « Intermédiaire » y tient (test de l’étape 4a) ; l’étoile n’y est finalement pas (D60).
+- À voir : découper la suite d’app.js (D31) si l’ajout du menu et de l’Index unifié le rend difficile à lire. Il fait environ 780 lignes après l’étape 4d.
 
 ## En parallèle · Écriture
 L’écriture n’attend pas le code, et c’est elle qui fixe le rythme du site.
