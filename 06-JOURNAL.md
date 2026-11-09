@@ -20,7 +20,8 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4 ; les tâches
 - En vue détail, les dernières décennies (1950, 1960) ne passent sans doute jamais en noir dans la barre du bas.
 - `changerZoom()` repère les couloirs par leur position : il suppose que Détail et Intermédiaire dessinent les mêmes couloirs dans le même ordre, ce qui est le cas aujourd’hui.
 - Depuis la vue d’ensemble, un clic sur une décennie ramène au dernier zoom choisi, pas forcément à « Détail ».
-- L’Index ne garde pas sa position de défilement au retour, et n’a pas d’adresse `#index` (prévue à l’étape 4c, D53).
+- L’Index ne garde pas sa position de défilement au retour.
+- « Explorer ce mouvement », au clavier : la frise se redessine après la fermeture du panneau, et le focus est perdu. Une ligne dans `explorer()` suffirait.
 - En vue mouvement, des disciplines longues passent sur deux lignes et agrandissent la ligne de l’artiste.
 - Une adresse `#id` qui reprend une propriété que tout objet JavaScript hérite (`#constructor`, `#toString`) fait planter `ouvrir()` : `OEU[id]` y trouve une fonction. Le démarrage vérifie `?mouvement=` avec `Object.hasOwn`, mais pas le `#id`. Correction d’une ligne, jugée inutile pour l’instant.
 - Le zoom « Intermédiaire » garde dans le code le nom de « Moyen » (`etat.moyen`, `data-niveau="moyen"`, `zoomMoyen()`, `pxParAnMoyen`, `largeurCarteMoyenne`) : voulu (D56), mais à garder en tête en lisant app.js.
@@ -79,6 +80,11 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4 ; les tâches
 ---
 
 # Entrées
+
+## 9 novembre 2026 · Étape 4c terminée : Index unifié
+**Fait** : sur la branche `index-unifie`, en quatre sous-étapes. Sous-étape 1 : l’Index garde ses onglets, et chaque ligne se cherche aussi par les noms qui lui sont liés (un artiste par son mouvement principal, une œuvre par son artiste et son mouvement) ; Entrée ouvre le premier résultat. Sous-étape 2 : à la fermeture du panneau, le focus revient à l’élément qui l’a ouvert, ou à la frise si cet élément a disparu. Sous-étape 3 : les adresses `/#index` et `/#hasard`, écrites une fois dans `ANCRES_FRISE` (`src/lib/site.js`) ; À propos et le plan du site au bas de l’Index ; retrait de la ligne « Pages du site » et de `PAGES_SITE`. Sous-étape 4 : « Au hasard » et Index dans l’en-tête des pages, comme liens vers la frise ; sur téléphone, ils passent sous le titre. Testé en local puis mergé dans main.
+**Écarté** : les trois types mêlés pendant la frappe, un message qui signale les résultats des autres onglets, un tirage au hasard sur place depuis les pages.
+**Décisions prises** : D58 ; D51 remplacée, D53 précisée.
 
 ## 9 novembre 2026 · Étape 4b terminée : en-tête commun
 **Fait** : sur la branche `entete-commun`, en trois sous-étapes. Sous-étape 1 : les pages fixes sont écrites une seule fois, dans `src/lib/site.js` ; le menu, le pied de page, l’Index, le plan du site et le sitemap en dérivent, sans changement visible. Sous-étape 2 : le thème est partagé par `ScriptTheme.astro` (le script du `<head>`) et `BoutonTheme.astro` (le bouton et `src/scripts/theme.js`) ; app.js perd sa section « Thème », et les pages reçoivent le bouton, au bout de leur en-tête. Une suppression incomplète de cette section a cassé la frise (`boutonTheme is not defined`) : corrigée en remplaçant app.js en entier, puis contrôlée par le diff. Sous-étape 3 : l’en-tête des pages devient `EnteteSite.astro`, et À propos entre dans le menu, à l’écart (D55). `npm run verifier` : aucun lien cassé. Testé en local et sur la version de test ; fusionné dans `main`.
