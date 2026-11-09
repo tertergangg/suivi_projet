@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : lot 4 (version téléphone et en-tête du site).** La phase 2 est terminée : chaque fiche rédigée a sa page, avec le catalogue, le référencement de base, À propos et le plan du site. Viennent ensuite la phase 3 (ouverture au public), puis la rubrique Comprendre (phase 4).
+**Étape en cours : lot 4, étape 4b (en-tête commun).** L’étape 4a est terminée. La phase 2 est terminée : chaque fiche rédigée a sa page, avec le catalogue, le référencement de base, À propos et le plan du site. Viennent ensuite la phase 3 (ouverture au public), puis la rubrique Comprendre (phase 4).
 
 ---
 
@@ -23,19 +23,22 @@ Le détail est dans le JOURNAL et dans l’historique Git.
   - 2h, liens de l’Index vers les pages, pied de page, plan du site et À propos (D51, D52).
 
 ## Lot 4 · Version téléphone et en-tête du site
-Phase dédiée, dans sa propre conversation, avant l’ouverture au public. Une branche par étape, testée sur la version de test.
-- **Pour commencer** : Térence apporte la liste des changements qu’il veut faire dans l’en-tête du site. La trier avec les points ci-dessous, puis découper le lot en étapes.
-- L’en-tête de la frise reçoit le menu du site (D18) et l’outil unique « Rechercher », qui réunit la recherche et l’Index (D28), dans un `<dialog>` pour la gestion du focus.
+Phase dédiée, avant l’ouverture au public. Une branche par étape, testée sur la version de test. L’en-tête est décidé (D53 à D55) ; la maquette cliquable de référence est sur claude.ai, hors du dépôt. Découpage arrêté le 9 novembre 2026 :
+- **4a · Zoom d’ouverture** · terminé le 9 novembre 2026. La frise s’ouvre sur « Intermédiaire », nouveau nom de « Moyen », et une fiche ouverte est placée en pixels (D56).
+- **4b · En-tête commun** : un composant d’en-tête pour les pages et la frise, une seule liste des pages fixes (aujourd’hui écrites à cinq endroits, voir le JOURNAL), le thème partagé par un petit script commun (les pages ne chargent pas app.js) et le bouton de thème sur les pages.
+- **4c · Index unifié**, dans le panneau (D53) : son champ devient la seule recherche ; décider comment s’affichent les résultats pendant la frappe ; rendre le focus au bouton à la fermeture (`fermer()` ne le fait pas) ; l’adresse `/#index`, où mène le bouton Index des pages ; À propos et le plan du site au bas de l’Index ; retrait de la ligne « Pages du site » (D51).
+- **4d · Nouvel en-tête de la frise** (D54, D55) : le menu avec À propos, les mouvements resserrés sur une ligne, le bouton Index avec sa loupe, l’étoile « Œuvres majeures » dans la barre du bas ; retrait du champ de recherche de l’en-tête.
+- **4e · La frise dans `Base.astro`** : un seul `<head>`, le bouton de thème sur tout le site. La frise n’a pas de pied de page : ses liens sont dans l’Index et dans le ☰ (D55).
+- **4f et suite · Téléphone** : le ☰ (rubriques, À propos, plan du site, thème), puis les points ci-dessous.
+
+Points à traiter au fil de ces étapes :
 - Revoir toute l’expérience sur petit écran, pages de la phase 2 comprises.
-- La frise passe au gabarit commun (`Base.astro`) : un seul `<head>`, le bouton de thème et le pied de page sur tout le site. D’ici là, les pages suivent le thème choisi sur la frise, sans bouton. La ligne « Pages du site » de l’Index (D51) devient alors inutile : la retirer.
-- À voir : réunir en une seule liste les pages fixes, écrites à cinq endroits (voir le JOURNAL).
-- Décider si le filtre du répertoire des artistes (D42) et la recherche du catalogue (D47) restent à côté de « Rechercher ».
+- Décider si le filtre du répertoire des artistes (D42) et la recherche du catalogue (D47) restent à côté de l’Index.
 - Pages : sur téléphone, le sommaire « Dans cette page » repousse le texte loin vers le bas ; un sommaire repliable réglerait ça. À propos et le plan du site ont été vus sur téléphone ; les pages des mouvements, des artistes et des œuvres, pas encore en détail.
-- À trancher : la frise doit-elle s’ouvrir sur le zoom Ensemble lors d’une première visite ?
-- Les règles téléphone ajoutées aux étapes 2a et 2b du lot 3 (libellé court « Au hasard », recherche sur toute la largeur, liste des résultats accrochée à gauche, bouton « Index » dans la même ligne) sont provisoires. La ligne des outils déborde sans doute.
+- Les règles téléphone ajoutées aux étapes 2a et 2b du lot 3 (libellé court « Au hasard », recherche sur toute la largeur, liste des résultats accrochée à gauche, bouton « Index » dans la même ligne) sont provisoires : l’étape 4d les remplace.
 - Étiquettes d’artistes de la vue mouvement : sur téléphone, les compléments (nombre d’œuvres, nationalité, disciplines, « Surtout ») sont cachés (classe `.complement`). À revoir si l’étiquette s’élargit.
-- Barre du bas : avec les trois boutons de zoom, elle est serrée sur téléphone (libellés à 0,75 rem).
-- À voir : découper la suite d’app.js (D31) si l’ajout du menu et de « Rechercher » le rend difficile à lire.
+- Barre du bas : serrée sur téléphone (libellés à 0,75 rem). « Intermédiaire » y tient (test de l’étape 4a), mais l’étoile « Œuvres majeures » s’y ajoutera à l’étape 4d.
+- À voir : découper la suite d’app.js (D31) si l’ajout du menu et de l’Index unifié le rend difficile à lire.
 
 ## En parallèle · Écriture
 L’écriture n’attend pas le code, et c’est elle qui fixe le rythme du site.

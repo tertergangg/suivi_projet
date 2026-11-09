@@ -118,7 +118,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
   - « ensemble » : toute la période, sans défilement ;
   - « mouvement » : une ligne par artiste, à l’adresse `/?mouvement=<id>` (D38).
 
-  Le zoom « Moyen » est la vue détail resserrée.
+  Le zoom « Intermédiaire » est la vue détail resserrée, et le zoom d’ouverture de la frise ; il s’appelle `moyen` dans le code (D56).
 - **Adresse** : elle suit l’affichage, par `history.replaceState`, sans ajouter d’étape à l’historique (D43). `changerVue()` tient à jour `?mouvement=<id>`, et `ouvrir()` le `#id` de la fiche ouverte ; les deux se combinent (`/?mouvement=fauvisme#matisse`). Au démarrage, la vue est affichée d’abord, la fiche ensuite ; un `?mouvement=` inconnu est retiré de l’adresse.
 - **Navigation** : glisser, flèches du clavier, barre du bas (zooms et repères), sommaire des mouvements, recherche insensible aux accents, « Une œuvre au hasard ».
 - **Panneau** : il affiche une fiche ou l’Index. Sous « Comment lire la frise », l’Index a une ligne « Pages du site », qui mène aux répertoires, à À propos et au plan du site jusqu’au lot 4 (D51). Les liens `[[id]]` deviennent des liens `#id`, qui ouvrent la fiche sur place ; un lien vers un groupe mène à la page de son mouvement (`destinationPanneau()`). Une fiche qui a sa page affiche « Lire la page » (D19), un vrai lien que le panneau n’intercepte pas. Une fiche d’œuvre commence par son image et son crédit, ou par l’encart d’une œuvre protégée (`encartDroits()`, D10).
@@ -182,11 +182,11 @@ pages.css, la feuille des pages (D39), est chargée après style.css et rangée 
 /artistes/    /artistes/<id>/     répertoire (par mouvement principal), puis une page par artiste
 /oeuvres/     /oeuvres/<id>/      catalogue filtrable, puis une page par œuvre documentée
 /comprendre/  parcours/<id>/  comparer/<id>/  glossaire/     phase 4
-/a-propos/  /plan-du-site/        dans le pied de page
+/a-propos/  /plan-du-site/        À propos dans l’en-tête (D55) ; les deux au pied des pages
 /sitemap.xml  /robots.txt         pour les moteurs de recherche (D49)
 /en/…                             phase 5
 ```
-Le menu : Frise, Mouvements, Artistes, Œuvres, Comprendre (dès la phase 4), puis « Rechercher » et le thème (D28). Les adresses sont rangées par type, jamais imbriquées (D18). Les événements n’ont pas de page.
+Le menu : Frise, Mouvements, Artistes, Œuvres, Comprendre (dès la phase 4), puis À propos, à l’écart des rubriques (D55) ; à droite, « Au hasard », l’Index et le thème (D28, D53, D54). Les adresses sont rangées par type, jamais imbriquées (D18). Les événements n’ont pas de page.
 
 **Liens** : `adresse()` (D40) donne déjà `/<type>/<id>/`, `/mouvements/<mouvement>/#<id>` pour un groupe, ou `/#id`. En phase 4, elle apprendra `/comprendre/glossaire/#<id>` pour un terme, et les adresses des parcours et des comparaisons.
 
@@ -197,11 +197,11 @@ Le menu : Frise, Mouvements, Artistes, Œuvres, Comprendre (dès la phase 4), pu
 | Vue mouvement | Qui, et dans quel ordre ? | Pas de texte : elle mène à la page du mouvement. |
 | Pages | Quoi, et pourquoi ? | Un repère simple et « Voir dans la frise » (D27). |
 | Comprendre | Comment tout cela s’articule ? | Elle relie les fiches, sans les recopier. |
-| Rechercher | Où est telle chose ? | Un outil, pas une rubrique. |
+| Index | Où est telle chose ? | Un outil, pas une rubrique (D53). |
 
 ## Ce qui reste à construire
 Les gabarits des mouvements, des artistes, des œuvres, des répertoires et des pages fixes sont en place (partie A). Restent :
-- au lot 4, l’en-tête de la frise avec le menu et « Rechercher » (D28), puis la frise dans `Base.astro`, avec un seul `<head>` et le pied de page ;
+- au lot 4, un en-tête commun, l’Index unifié dans le panneau et le nouvel en-tête de la frise (D53 à D55), puis la frise dans `Base.astro`, avec un seul `<head>` ; la frise n’a pas de pied de page, ses liens sont dans l’Index et le ☰ ;
 - en phase 3, la page 404 (`src/pages/404.astro`), hors du sitemap et du contrôle de `dist/` ;
 - en phase 4, `src/pages/comprendre/` : l’accueil de la rubrique, le gabarit Article (parcours, comparaison) et le glossaire.
 

@@ -18,12 +18,13 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4 ; les tâches
 **Frise**
 - En vue mouvement, un mouvement court tient presque entier à l’écran : la vue ne défile pas, et un clic sur un repère de la barre du bas ne fait rien de visible.
 - En vue détail, les dernières décennies (1950, 1960) ne passent sans doute jamais en noir dans la barre du bas.
-- Le centrage d’une fiche ouverte est compté en années (`allerAnnee(annee - 3, …)`) : au zoom Moyen, la carte arrive plus près du bord gauche.
-- `changerZoom()` repère les couloirs par leur position : il suppose que Détail et Moyen dessinent les mêmes couloirs dans le même ordre, ce qui est le cas aujourd’hui.
+- `changerZoom()` repère les couloirs par leur position : il suppose que Détail et Intermédiaire dessinent les mêmes couloirs dans le même ordre, ce qui est le cas aujourd’hui.
 - Depuis la vue d’ensemble, un clic sur une décennie ramène au dernier zoom choisi, pas forcément à « Détail ».
-- L’Index ne garde pas sa position de défilement au retour, et n’a pas d’adresse `#index`.
+- L’Index ne garde pas sa position de défilement au retour, et n’a pas d’adresse `#index` (prévue à l’étape 4c, D53).
 - En vue mouvement, des disciplines longues passent sur deux lignes et agrandissent la ligne de l’artiste.
 - Une adresse `#id` qui reprend une propriété que tout objet JavaScript hérite (`#constructor`, `#toString`) fait planter `ouvrir()` : `OEU[id]` y trouve une fonction. Le démarrage vérifie `?mouvement=` avec `Object.hasOwn`, mais pas le `#id`. Correction d’une ligne, jugée inutile pour l’instant.
+- Le zoom « Intermédiaire » garde dans le code le nom de « Moyen » (`etat.moyen`, `data-niveau="moyen"`, `zoomMoyen()`, `pxParAnMoyen`, `largeurCarteMoyenne`) : voulu (D56), mais à garder en tête en lisant app.js.
+- Le décalage d’une fiche ouverte (3 ans au zoom Détail, dans `ouvrir()`) est un nombre écrit dans le code, alors que CONVENTIONS demande de nommer une valeur qu’on touche : à passer dans `REGLAGES`.
 - Thème : la clé `theme` et les valeurs `light`/`dark` sont écrites à trois endroits (le script du `<head>` d’index.astro, celui de Base.astro, et app.js). Après un clic, la bulle du bouton garde l’ancien libellé jusqu’au survol suivant.
 - En-tête : la hauteur du bouton de thème (`2.25rem`) et le `margin-top` de la case « Œuvres majeures seulement » (`0.3rem`) sont calés à la main sur les boutons des mouvements.
 - style.css : `--trait` n’est utilisée nulle part.
@@ -78,6 +79,12 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4 ; les tâches
 ---
 
 # Entrées
+
+## 9 novembre 2026 · Lot 4 : en-tête décidé, découpage, étape 4a terminée
+**Fait** : tri des changements d’en-tête voulus par Térence, avec une maquette cliquable (ordinateur et téléphone, vraies couleurs), publiée sur claude.ai et gardée hors du dépôt. En-tête décidé : deux lignes, l’Index garde son nom et son panneau, À propos entre dans le menu, les mouvements restent des boutons encadrés mais tiennent sur une ligne, l’étoile « Œuvres majeures » passe dans la barre du bas. Les largeurs ont été mesurées avec Archivo. Le lot est découpé en étapes 4a à 4f (ROADMAP). Étape 4a, sur la branche `zoom-intermediaire` : la frise s’ouvre au zoom « Intermédiaire », nouveau nom de « Moyen » (libellé seul), et une fiche ouverte est placée en pixels, sans changement en Détail. Testé en local et sur la version de test, téléphone compris (la barre du bas tient) ; fusionné dans `main`.
+**Écarté** : l’Index dans un `<dialog>`, un onglet Événements, une barre continue de mouvements soulignés de leur couleur, une phrase d’aide dans le bouton Index.
+**Reste à faire** : l’étape 4b (en-tête commun), dans une nouvelle conversation.
+**Décisions prises** : D53 à D56 ; D18 et D28 précisées.
 
 ## 8 novembre 2026 · Étape 2h terminée, fin de la phase 2
 **Fait** : sur la branche `finitions`, en quatre sous-étapes. Index de la frise : une ligne « Pages du site » sous « Comment lire la frise », et non en bas, où elle serait passée après les 104 œuvres (D51). Pied de page des pages dans `Base.astro` (À propos, Plan du site), le lien de la page affichée marqué `aria-current`. Plan du site `/plan-du-site/`, calculé comme le sitemap (D52). Page À propos `/a-propos/`, au texte écrit dans son gabarit, en une colonne centrée (`.page-simple`, `:has()`) ; l’adresse de contact est factice. Les deux pages sont dans `PAGES_FIXES`, avec leur description. `npm run verifier` : aucun lien cassé. Testé en local et sur la version de test, où une adresse sans barre finale mène bien à l’adresse avec barre ; branche fusionnée dans `main`. La phase 2 est terminée.
