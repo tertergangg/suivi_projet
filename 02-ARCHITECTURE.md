@@ -4,7 +4,7 @@ Ce document décrit comment le site fonctionne (partie A) et ce qu’il doit dev
 
 ---
 
-# A. État actuel (novembre 2026, lot 4 en cours, étape 4d terminée)
+# A. État actuel (novembre 2026, lot 4 en cours, étape 4e terminée)
 
 ## Flux des données
 ```
@@ -43,9 +43,9 @@ src/
     plan-du-site.astro   toutes les pages, rangées par rubrique, calculées comme le sitemap (D52)
     sitemap.xml.js       la liste des pages, pour les moteurs de recherche (D49)
     robots.txt.js        ce que les robots peuvent lire, et l’adresse du sitemap (D49)
-  layouts/Base.astro     gabarit des pages : <head>, en-tête (EnteteSite), fil d’Ariane, pied de page
+  layouts/Base.astro     gabarit des pages : <head> (TeteHtml, puis pages.css), en-tête (EnteteSite), fil d’Ariane, pied de page
   components/            morceaux communs aux pages : Ligne, Carte, EnteteFiche, Lecture ;
-                         et, aussi sur la frise, EnteteSite, ScriptTheme et BoutonTheme (D57, D59)
+                         et, aussi sur la frise, TeteHtml, EnteteSite, ScriptTheme et BoutonTheme (D57, D59, D61)
   scripts/app.js         fonctionnement de la frise, ≈ 780 lignes
   scripts/theme.js       le bouton de thème, chargé par BoutonTheme (D57)
   lib/                   partagé par la frise et les pages (D31)
@@ -111,7 +111,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 `fiche` contient le Markdown, ou une chaîne vide si la fiche est vide. Les listes (`autres`, `groupes`, `voirAussi`, `etapes`, `elements`) contiennent des identifiants. Une valeur inconnue est signalée ; `autres` et `voirAussi` la gardent, `groupes` l’écarte. La frise ne lit les groupes que pour les liens `[[groupe]]` ; elle n’utilise ni la clé `groupes` des artistes, ni `glossaire`, ni `parcours`, ni `comparaisons`, et n’affiche que les relations entre deux artistes. `niveau` décide, par `aUnePage()`, si une œuvre a sa page. Les pages utilisent `groupes` et toutes les relations ; `glossaire`, `parcours` et `comparaisons` attendent la phase 4.
 
 ## La frise
-- **index.astro** : la structure fixe de la page (script du thème dans le `<head>`, par `ScriptTheme`, un `<h1>` caché, l’en-tête commun `EnteteSite` et sa seconde ligne, les mouvements et l’étoile « Œuvres majeures » (D59, D60), bandeau, zone qui défile, barre du bas, bulle, panneau, `<dialog>` de l’image) et son script, `src/scripts/app.js`, qu’Astro traite comme un module.
+- **index.astro** : la structure fixe de la page (le contenu du `<head>`, par `TeteHtml`, sans pages.css (D61), un `<h1>` caché, l’en-tête commun `EnteteSite` et sa seconde ligne, les mouvements et l’étoile « Œuvres majeures » (D59, D60), bandeau, zone qui défile, barre du bas, bulle, panneau, `<dialog>` de l’image) et son script, `src/scripts/app.js`, qu’Astro traite comme un module.
 - **src/lib/** fabrique ce qui sert aussi aux pages : données, outils, contenu des fiches. Rien n’y touche à `document` ni à `window`, pour que ces fichiers fonctionnent au build.
 - **app.js** fait tout le reste :
   - `REGLAGES`, en tête du fichier, réunit les réglages modifiables ;
@@ -129,7 +129,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - **Accessibilité**, à préserver : ARIA, focus visible, clavier, `prefers-reduced-motion`, `aria-live` du panneau coupé pendant l’Index.
 
 ## Les pages
-- **Gabarit** : chaque page passe par `src/layouts/Base.astro`. Il pose le `<head>` (une copie de celui d’index.astro jusqu’à l’étape 4e, avec le titre, la description et l’adresse canonique ; le script du thème est commun), l’en-tête du site (`EnteteSite`), le fil d’Ariane et le pied de page (À propos, Plan du site). Le menu montre Frise, Mouvements, Artistes et Œuvres, puis À propos, à l’écart (D55) : Comprendre n’y entrera qu’avec son contenu (D18). Le bouton de thème est au bout de l’en-tête. Le menu et le pied de page viennent de `PAGES_FIXES` (src/lib/site.js, D57).
+- **Gabarit** : chaque page passe par `src/layouts/Base.astro`. Il pose le `<head>` (le composant `TeteHtml`, commun avec la frise, auquel il passe le titre suivi de « · L’art moderne », la description et le chemin, puis pages.css, D61), l’en-tête du site (`EnteteSite`), le fil d’Ariane et le pied de page (À propos, Plan du site). Le menu montre Frise, Mouvements, Artistes et Œuvres, puis À propos, à l’écart (D55) : Comprendre n’y entrera qu’avec son contenu (D18). Le bouton de thème est au bout de l’en-tête. Le menu et le pied de page viennent de `PAGES_FIXES` (src/lib/site.js, D57).
 - **Fabrication** : tout est calculé au build, depuis `frise.json`. Une page dynamique (`[id].astro`) exporte `getStaticPaths()`, qui renvoie un objet par page à fabriquer ; seuls les éléments dont `aUnePage()` est vrai en reçoivent une (D13).
 - **Adresses** : `aUnePage()` et `adresse()` (src/lib/fiches.js) sont les seules à décider où mène un lien (D40). Les composants `Ligne` et `Carte` en déduisent leur adresse et leur flèche (« Lire la page » ou « Voir dans la frise »). Le texte des fiches passe par `textePage()`, qui appelle `markdown(md, true)` et donne un id à chaque titre `##`, pour le sommaire.
 - **Composants** (`src/components/`) :
@@ -138,6 +138,7 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
   - `EnteteFiche` : la bande de couleur, le titre, « Voir dans la frise », et le repère chronologique d’un mouvement ;
   - `Lecture` : le sommaire « Dans cette page » et la colonne de texte ;
   - `EnteteSite` : l’en-tête du site, sur les pages et la frise (D59) : le titre, le menu, « Au hasard », l’Index et le bouton de thème. Il reçoit la rubrique et le chemin de la page ; sur la frise, `surFrise`, qui fait de « Au hasard » et de l’Index des boutons, et la ligne des mouvements par son `<slot />` ;
+  - `TeteHtml` : le contenu du `<head>`, aussi sur la frise (D61) : le titre, la description, l’adresse canonique, le script du thème, les polices et style.css. Ce qu’on place entre ses balises arrive à la fin du `<head>` : les pages y mettent pages.css ;
   - `ScriptTheme` et `BoutonTheme` : le script du thème et son bouton, aussi sur la frise (D57).
 - **Page mouvement** : l’en-tête avec ses dates et son lieu, le repère, puis le texte, les groupes (une section et une ancre chacun), les artistes, les œuvres majeures en cartes, les autres œuvres en liste, les moments clés, les filiations et réactions.
 - **Page artiste** : l’en-tête sans chapeau (D41), les rubriques (Nationalité, Disciplines, Mouvement, Aussi, Groupes), le texte, les œuvres en cartes, les liens avec d’autres artistes et avec des mouvements.
@@ -148,8 +149,8 @@ Un objet `{ mouvements, groupes, artistes, oeuvres, evenements, influences, glos
 - « Voir dans la frise » mène à la vue mouvement (`/?mouvement=<id>`) depuis une page mouvement, et à `/#id` depuis une page artiste ou œuvre (D27).
 
 ## Référencement
-- **Titre et description** : chaque page passe à `Base.astro` son titre et une phrase de description (`<meta name="description">`). Le résumé court du tableur pour un mouvement ou une œuvre, la phrase-clé pour un artiste ; une phrase écrite dans l’en-tête Astro, aux nombres et aux dates calculés, pour un répertoire ou une page fixe. Sans phrase, pas de balise. La frise a la sienne dans index.astro.
-- **Adresse canonique** (D48) : `new URL(chemin, Astro.site)`, où `site` est l’adresse de production d’`astro.config.mjs`, et le chemin celui de la page, toujours avec la barre finale. La frise déclare `/` dans toutes ses vues.
+- **Titre et description** : chaque page passe à `Base.astro` son titre et une phrase de description (`<meta name="description">`). Le résumé court du tableur pour un mouvement ou une œuvre, la phrase-clé pour un artiste ; une phrase écrite dans l’en-tête Astro, aux nombres et aux dates calculés, pour un répertoire ou une page fixe. Sans phrase, pas de balise. La frise a la sienne dans index.astro. Les deux la passent à `TeteHtml`, qui écrit la balise (D61).
+- **Adresse canonique** (D48) : calculée dans `TeteHtml`, par `new URL(chemin, Astro.site)`, où `site` est l’adresse de production d’`astro.config.mjs`, et le chemin celui de la page, toujours avec la barre finale. La frise déclare `/` dans toutes ses vues.
 - **sitemap.xml** (D49) : `PAGES_FIXES` (src/lib/site.js, D57 : la frise, les trois répertoires, À propos et le plan du site), puis les éléments dont `aUnePage()` est vrai, à l’adresse que donne `adresse()`. Les adresses sont complètes, sur la production.
 - **robots.txt** (D49) : tout est permis, et la dernière ligne donne l’adresse du sitemap.
 - **Contrôle de `dist/`** (D50) : `verifier_dist.mjs` lit chaque page HTML de `dist/` et signale un lien interne qui ne mène à aucun fichier, une ancre sans `id` correspondant (sauf vers la frise), une page absente du sitemap ou une adresse du sitemap sans page. Il ne voit pas les liens que la frise fabrique en JavaScript, que construire.py vérifie à la source.
@@ -206,7 +207,7 @@ Le menu : Frise, Mouvements, Artistes, Œuvres, Comprendre (dès la phase 4), pu
 
 ## Ce qui reste à construire
 Les gabarits des mouvements, des artistes, des œuvres, des répertoires et des pages fixes sont en place (partie A). Restent :
-- au lot 4, la frise dans `Base.astro`, avec un seul `<head>` (la frise n’a pas de pied de page : ses liens sont dans l’Index et le ☰), puis le ☰ et la version téléphone ;
+- au lot 4, le ☰ et la version téléphone (la frise n’a pas de pied de page : ses liens sont dans l’Index et le ☰) ;
 - en phase 3, la page 404 (`src/pages/404.astro`), hors du sitemap et du contrôle de `dist/` ;
 - en phase 4, `src/pages/comprendre/` : l’accueil de la rubrique, le gabarit Article (parcours, comparaison) et le glossaire.
 

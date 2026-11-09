@@ -33,7 +33,6 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4 ; les tâches
 - style.css : `--trait` n’est utilisée nulle part.
 
 **Pages**
-- Le `<head>` est écrit deux fois, dans index.astro et dans src/layouts/Base.astro, jusqu’à l’étape 4e : un changement des polices, de la description ou de la canonique se fait dans les deux. Le script du thème, lui, est commun (`ScriptTheme.astro`).
 - Le libellé « Lire la page ↗ » est écrit à trois endroits : `lirePage()` (src/lib/fiches.js), Ligne.astro et Carte.astro.
 - Le tri des œuvres par année est écrit à six endroits (pages mouvement, artiste et œuvre, catalogue, plan du site, `listeOeuvres()`), et pas de la même façon : `listeOeuvres()` met une œuvre sans année en tête, les pages la mettent en fin de liste. Piste : une fonction `parAnnee` dans src/lib/outils.js.
 - L’écart et la graisse d’À propos dans le menu (`.menu .a-part` de style.css : 0,8 rem et 600) ont été choisis à l’œil, sans les valeurs de la maquette.
@@ -82,6 +81,12 @@ Les défauts propres au téléphone sont dans la ROADMAP, au lot 4 ; les tâches
 ---
 
 # Entrées
+
+## 9 novembre 2026 · Étape 4e terminée : un seul `<head>`
+**Fait** : sur la branche `lot4e`. Le contenu du `<head>` passe dans un composant, `src/components/TeteHtml.astro`, appelé par index.astro et par Base.astro ; Base y glisse pages.css, la frise rien (D61). Le bouton de thème était déjà sur tout le site depuis l’étape 4d. Le HTML fabriqué avant et après, comparé avec `git diff --no-index --word-diff` sur la frise et sur À propos, ne diffère que par des commentaires. `npm run verifier` : aucun lien cassé. Testé en local et sur la version de test, téléphone compris ; fusionné dans `main`.
+**Écarté** : la frise dans Base.astro, avec une propriété `surFrise`.
+**Reste à faire** : l’étape 4f (le ☰ et la version téléphone), dans une nouvelle conversation, en commençant par la liste des défauts relevés sur téléphone et par le découpage éventuel d’app.js.
+**Décisions prises** : D61.
 
 ## 9 novembre 2026 · Étape 4d terminée : nouvel en-tête de la frise
 **Fait** : sur la branche `entete-frise`, en une seule livraison plutôt qu’en quatre sous-étapes. La frise prend `EnteteSite.astro` : la propriété `surFrise` y fait de « Au hasard » et de l’Index des boutons, et la ligne des mouvements arrive par le `<slot />` ; un `<h1>` caché remplace le grand titre. Les règles de l’en-tête passent de pages.css à style.css. Le champ de recherche de l’en-tête et son code quittent app.js, et Index reçoit sa loupe. Les mouvements, resserrés, tiennent sur une ligne ; celui de la vue mouvement reste rempli de sa couleur (`aria-current`). Après essai, l’étoile « Œuvres majeures », d’abord placée dans la barre du bas, passe au bout de la ligne des mouvements, et les trois boutons de droite reçoivent la même hauteur et la même ombre. `npm run verifier` : aucun lien cassé. Testé en local et sur la version de test ; fusionné dans `main`.

@@ -1,6 +1,6 @@
 # Roadmap
 
-**Étape en cours : lot 4, étape 4e (la frise dans `Base.astro`).** Les étapes 4a à 4d sont terminées. La phase 2 est terminée : chaque fiche rédigée a sa page, avec le catalogue, le référencement de base, À propos et le plan du site. Viennent ensuite la phase 3 (ouverture au public), puis la rubrique Comprendre (phase 4).
+**Étape en cours : lot 4, étape 4f (le ☰ et la version téléphone).** Les étapes 4a à 4e sont terminées. La phase 2 est terminée : chaque fiche rédigée a sa page, avec le catalogue, le référencement de base, À propos et le plan du site. Viennent ensuite la phase 3 (ouverture au public), puis la rubrique Comprendre (phase 4).
 
 ---
 
@@ -28,8 +28,8 @@ Phase dédiée, avant l’ouverture au public. Une branche par étape, testée s
 - **4b · En-tête commun** · terminé le 9 novembre 2026. Une seule liste des pages fixes (`src/lib/site.js`), le thème partagé par deux composants et le bouton de thème sur les pages, l’en-tête des pages dans `EnteteSite.astro`, avec À propos dans le menu (D57).
 - **4c · Index unifié** · terminé le 9 novembre 2026. Recherche par onglet élargie aux noms liés, focus rendu à la fermeture, adresses `/#index` et `/#hasard`, À propos et plan du site au bas de l’Index, « Au hasard » et Index dans l’en-tête des pages (D58).
 - **4d · Nouvel en-tête de la frise** · terminé le 9 novembre 2026. La frise prend `EnteteSite.astro`, dont les règles passent dans style.css (D59) ; l’ancien champ de recherche est retiré ; l’Index a sa loupe ; les mouvements tiennent sur une ligne, suivis de l’étoile « Œuvres majeures », et les trois boutons de droite ont la même ombre (D60).
-- **4e · La frise dans `Base.astro`** : un seul `<head>`, le bouton de thème sur tout le site. La frise n’a pas de pied de page : ses liens sont dans l’Index et dans le ☰ (D55). `Base.astro` charge pages.css et pose `body.page`, que la frise ne doit pas recevoir : à régler au plan de l’étape.
-- **4f et suite · Téléphone** : le ☰ (rubriques, À propos, plan du site, thème), puis les points ci-dessous. Térence a relevé de nombreux défauts sur téléphone à la fin de l’étape 4d : les lister au début de l’étape.
+- **4e · Un seul `<head>`** · terminé le 9 novembre 2026. Le contenu du `<head>` passe dans `TeteHtml.astro`, commun à la frise et aux pages ; la frise garde son propre gabarit, sans pages.css ni pied de page (D61). Le bouton de thème était déjà sur tout le site depuis l’étape 4d.
+- **4f et suite · Téléphone** : le ☰ (rubriques, À propos, plan du site, thème), puis les points ci-dessous. Térence a relevé de nombreux défauts sur téléphone à la fin de l’étape 4d : les lister au début de l’étape, et décider en même temps s’il faut découper app.js (voir ci-dessous).
 
 Points à traiter au fil de ces étapes :
 - Revoir toute l’expérience sur petit écran, pages de la phase 2 comprises.
